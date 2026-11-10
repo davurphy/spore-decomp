@@ -1,0 +1,3 @@
+# Functions in open pull requests (claims). Generated 2026-11-10 23:54 UTC from 0 open pull requests.
+# A claim lasts while its pull request is open; tools/contrib/task.py treats one with no update for 7 days as stale.
+# address    pr     author                 last update
