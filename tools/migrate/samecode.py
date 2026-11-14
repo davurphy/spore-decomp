@@ -50,9 +50,10 @@ def slice_of(va):
 _objs = {}
 
 
-def code(ident, va, src):
+def code(ident, va, src, extra=()):
     """(masked bytes, [(offset, normalised target)]) of the function at va in ident's compiled source."""
     flags, _how = S.choose_flags(ident, va)
+    flags = list(flags) + list(extra)
     if src.replace(os.sep, "/").split("/src/game/")[-1] != src and \
             not any(f.rstrip("/").endswith("src/game/include") for f in flags if f.startswith("/I")):
         flags = list(flags) + ["/Isrc/game/include"]
@@ -103,8 +104,11 @@ def main():
         r = subprocess.run(["git", "show", "%s:%s" % (base, rel)], cwd=ROOT, capture_output=True, text=True)
         if r.returncode == 0:
             old_vas = {int(v, 16) for v in re.findall(r"(?mi)^// @ 0x([0-9a-f]+)", r.stdout)}
-            # beside the TU, so its relative includes resolve the same way; the symbol lookup is by the marker
-            old_tu = os.path.join(os.path.dirname(tu), "_base_%d_%s" % (os.getpid(), os.path.basename(tu)))
+            # in scratch, not beside the TU: a copy in src/game was picked up (and then missing) by a gate running at the
+            # same time (2026-11-14).  The TU's directory goes on the include path so its relative includes still resolve
+            d = os.path.join(ROOT, "work", "scratch", "samecode_base", str(os.getpid()))
+            os.makedirs(d, exist_ok=True)
+            old_tu = os.path.join(d, os.path.basename(tu))
             open(old_tu, "w").write(r.stdout)
     try:
         bad = run_rows(vas, mid, tu, old_tu, old_vas)
@@ -119,7 +123,7 @@ def run_rows(vas, mid, tu, old_tu, old_vas):
     for va in vas:
         if va in old_vas:
             try:
-                a, b = code(mid, va, tu), code(mid, va, old_tu)
+                a, b = code(mid, va, tu), code(mid, va, old_tu, ["/I" + os.path.relpath(os.path.dirname(tu), ROOT)])
             except RuntimeError as e:
                 a, b = None, e
             if a == b:

@@ -4879,6 +4879,17 @@ class Rewrite:
                 return RS.rename_word(t, old_n, new_n, ns, qualified_only=True)
             return ctor(RS.rename_word(t, old_n, new_n, ns))
         self.items = [(k, _ren_item(t)) for k, t in self.items]
+        # `using EA::Swarm::ParseRangedFloat;` names the declaration just renamed inside namespace EA::Swarm: respelled with
+        # it, or the using-declaration names nothing, is dropped, and every renamed call is C3861 (2026-11-14,
+        # SPAppCloudDescription s00f559e0: six Execute functions held)
+        homes = {"::".join(RS.unwrap_namespaces(t)[0] or ()) for _k, t in self.items
+                 if re.search(r"\b%s\b" % re.escape(new_n), t) and RS.unwrap_namespaces(t)[0]}
+        def _ren_using(t):
+            mu = re.match(r"^(\s*using\s+)((?:::)?[\w:]+?)::%s(\s*;.*)$" % re.escape(old_n), t, re.S)
+            if mu and mu.group(2).lstrip(":") in homes:
+                return mu.group(1) + mu.group(2) + "::" + new_n + mu.group(3)
+            return t
+        self.items = [(k, _ren_using(t)) for k, t in self.items]
         for c in fns:
             if verbatim_only and not getattr(c, "verbatim", False):
                 continue
@@ -5816,7 +5827,13 @@ def main():
     if a.apply:
         if not os.environ.get("RW_NO_WRITE"):
             rw.write_renames()
+        n_notes = len(rw.notes)
         ok, log = rw.apply_checked()
+        # what the apply rounds decided (holds, demotions, dedups): printed before only for the dry part, so a module
+        # rolled back with "every listed function stayed in its slice" said nowhere why (2026-11-14)
+        for n in rw.notes[n_notes:]:
+            if n[0] != "probe":
+                print("apply-note", n[0], n[1][:240])
         if not ok:
             print("COMPILE FAILED (module TU and bookkeeping restored)\n" + log[-6000:])
         else:
