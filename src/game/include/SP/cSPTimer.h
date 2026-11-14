@@ -33,7 +33,7 @@ class cSPTimer : public EA::RefCountVTemplate<int> /* +0x0 */ {
   unsigned __int64 mElapsedTime;                               // 0x008 relaid
   unsigned __int64 mBaseTime;                                  // 0x010 relaid
   bool mRunning;                                               // 0x018 relaid
-  void (*mGetMillisecondTime)();                               // 0x01c relaid
+  unsigned __int64 (__cdecl *mGetMillisecondTime)();                               // 0x01c relaid
 };
 #pragma pack(pop)
 // sizeof(cSPTimer) expected 0x20 (unverified)
