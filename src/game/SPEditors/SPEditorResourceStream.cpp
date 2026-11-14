@@ -1,22 +1,7 @@
-// src/game/SPEditors/SPEditorResourceStream.cpp -- migrated from slice(s) s005cb060 by tools/migrate/rewrite.py
-// Object file: SPEditors/SPEditorResourceStream.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// SPEditorResourceStream.cpp -- buffered write stream (cBufferedStream) that forwards to a COM target.
 
 #include "game/types.h"
-#include "EA/UTFWinControls/IWinButton.h"
-#include "EA/UTFWin/IWinProc.h"
-#include "EA/UTFWin/IWindow.h"
-#include "SP/cSPPalette.h"
-#include "SP/cSPPaletteCategory.h"
-#include "SP/cSPPaletteCategoryUI.h"
-#include "SP/cSPPaletteUI.h"
-#include "cSPUILayout.h"
-#include "cSPUIPropertyLayout.h"
-#include "SP/cString.h"
-#include <new>
-#include <string.h>
 
-// ---- items of slice s005cb060 begin (TODO(rewrite): local stubs, replace by canonical classes)
 namespace EA {
 template <typename T>
 class RefCountVTemplate_s005c_b060 {
@@ -40,6 +25,7 @@ class IUnknown32_s005c_b060 {
 };  // namespace COM
 }
 }
+static const uint32_t kHeapSharedFlag = 0x40000000;  // name is a guess
 struct HeapBlock {
   uint32_t mSize;
   uint32_t mFlags;
@@ -65,7 +51,7 @@ class cStreamBuffer {
   void Reset();                                  // 0x004bdae0
   void destroy_shared();                         // 0x004bca10
   ~cStreamBuffer() {
-    if (mpHeap && (mpHeap->mFlags10 & 0x40000000))
+    if (mpHeap && (mpHeap->mFlags10 & kHeapSharedFlag))
       destroy_shared();
     mpHeap = 0;
   }
@@ -101,7 +87,6 @@ class cBufferedStream : public EA::RefCountVTemplate_s005c_b060<int>, public ISt
   cStreamBuffer mBuffer;              // +0x14
   EA::COM::IUnknown32_s005c_b060* mpTarget;      // +0x42cc
 };
-// ---- items of slice s005cb060 end
 
 // @ 0x005cbca0
 int cBufferedStream::GetState()
@@ -137,9 +122,7 @@ int cBufferedStream::GetValue(int which)
 // @ 0x005cbd00
 int cBufferedStream::Matches(int value, int which)
 {
-  if ((which == 0 && value == mPosition) || (which == 1 && value == 0))
-    return 1;
-  return 0;
+  return (which == 0 && value == mPosition) || (which == 1 && value == 0);
 }
 
 // @ 0x005cbd30
@@ -186,13 +169,16 @@ bool cBufferedStream::Close()
   return mbOK;
 }
 
+static const uint32_t kHeapMagic = 0x86421357;
+static const uint32_t kHeapCapacity = 0x3a88;  // bytes managed by the embedded heap (name is a guess)
+
 // @ 0x005cbe40
 cStreamBuffer::cStreamBuffer()
 {
   mpHeap = (HeapHeader*)mBuffer;
   if (mpHeap) {
-    mpHeap->mMagic = 0x86421357;
-    mpHeap->mCapacity = 0x3a88;
+    mpHeap->mMagic = kHeapMagic;
+    mpHeap->mCapacity = kHeapCapacity;
     HeapBlock* block = (HeapBlock*)((char*)mpHeap + 0x10);
     block->mSize = 8;
     block->mFlags = 0;

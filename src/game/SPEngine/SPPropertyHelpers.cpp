@@ -1,34 +1,43 @@
-// src/game/SPEngine/SPPropertyHelpers.cpp -- migrated from slice(s) s006a11b0, s0069f950 by tools/migrate/rewrite.py
-// Object file: SPEngine/SPPropertyHelpers.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// Typed accessors that read one property out of a cPropertyList.
+// Each returns false when the list is null, the property is missing, or its type does not match.
 
 #include "game/types.h"
 #include "SP/cPropertyList.h"
 #include "EA/Variant.h"
-#include "EA/IO/FileStream.h"
 #include "cSPVector2.h"
 #include "cSPVector3.h"
 #include "cSPVector4.h"
 #include "EA/ResourceMan/Key.h"
 #include "SP/cString.h"
-#include "eastl/allocator.h"
-#include "SP/cDirectPropertyList.h"
-#include "SP/cResourceBase.h"
 #include "cSPColorRGB.h"
 #include "cSPColorRGBA.h"
 
-// ---- items of slice s006a11b0 begin (TODO(rewrite): local stubs, replace by canonical classes)
 namespace SP {
+// Retail helper that copies a text value into a cString (not yet decompiled).
 void cStringSet(const void* src, cString* out);
 }
-// ---- items of slice s006a11b0 end
+
+// Variant type ids (names are guesses from usage).
+enum {
+    kTypeString8 = 0x12,
+    kTypeString16 = 0x13,
+    kTypeKey = 0x20,
+    kTypeText = 0x22,
+    kTypeVector2 = 0x30,
+    kTypeVector3 = 0x31,
+    kTypeColorRGB = 0x32,
+    kTypeVector4 = 0x33,
+    kTypeColorRGBA = 0x34,
+};
+// Variant flag bit meaning "holds an array" (name is a guess).
+const unsigned int kFlagArray = 0x10;
 
 // @ 0x006a0920
 namespace SP {
 bool GetPropertyAsVector2Array(cPropertyList const * list, unsigned int id, int * count, cSPVector2 ** data)
 {
     EA::Variant const * p;
-    if (list && list->GetProperty(id, &p) && p->mTypeId == 0x30 && (p->mFlags & 0x10)) {
+    if (list && list->GetProperty(id, &p) && p->mTypeId == 0x30 && (p->mFlags & kFlagArray)) {
         *count = (p->mFlags & 0x30) ? p->mPointer.mElementCount : 1;
         *data = (p->mFlags & 0x30) ? (cSPVector2*)p->mPointer.mpData : (p->mTypeId ? (cSPVector2*)p : 0);
         return true;
@@ -43,7 +52,7 @@ namespace SP {
 bool GetPropertyAsVector2(cPropertyList const * list, unsigned int id, cSPVector2 * dst)
 {
     EA::Variant const * p;
-    if (list && list->GetProperty(id, &p) && p->mTypeId == 0x30) {
+    if (list && list->GetProperty(id, &p) && p->mTypeId == kTypeVector2) {
         *dst = *p->GetVector2();
         return true;
     }
@@ -57,7 +66,7 @@ namespace SP {
 bool GetPropertyAsVector3(cPropertyList const * list, unsigned int id, cSPVector3 * dst)
 {
     EA::Variant const * p;
-    if (list && list->GetProperty(id, &p) && p->mTypeId == 0x31) {
+    if (list && list->GetProperty(id, &p) && p->mTypeId == kTypeVector3) {
         *dst = *p->GetVector3();
         return true;
     }
@@ -71,7 +80,7 @@ namespace SP {
 bool GetPropertyAsVector4(cPropertyList const * list, unsigned int id, cSPVector4 * dst)
 {
     EA::Variant const * p;
-    if (list && list->GetProperty(id, &p) && p->mTypeId == 0x33) {
+    if (list && list->GetProperty(id, &p) && p->mTypeId == kTypeVector4) {
         *dst = *p->GetVector4();
         return true;
     }
@@ -84,10 +93,10 @@ bool GetPropertyAsVector4(cPropertyList const * list, unsigned int id, cSPVector
 namespace SP {
 bool GetPropertyAsColorRGB(cPropertyList const * list, unsigned int key, cSPColorRGB * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x32) {
+  if (prop->mTypeId == kTypeColorRGB) {
     *out = *prop->GetColorRGB();
     return true;
   }
@@ -99,10 +108,10 @@ bool GetPropertyAsColorRGB(cPropertyList const * list, unsigned int key, cSPColo
 namespace SP {
 bool GetPropertyAsColorRGBA(cPropertyList const * list, unsigned int key, cSPColorRGBA * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x34) {
+  if (prop->mTypeId == kTypeColorRGBA) {
     *out = *prop->GetColorRGBA();
     return true;
   }
@@ -114,10 +123,10 @@ bool GetPropertyAsColorRGBA(cPropertyList const * list, unsigned int key, cSPCol
 namespace SP {
 bool GetPropertyAsKey(cPropertyList const * list, unsigned int key, EA::ResourceMan::Key * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x20) {
+  if (prop->mTypeId == kTypeKey) {
     *out = *prop->GetKey();
     return true;
   }
@@ -129,10 +138,10 @@ bool GetPropertyAsKey(cPropertyList const * list, unsigned int key, EA::Resource
 namespace SP {
 bool GetPropertyAsKeyInstance(cPropertyList const * list, unsigned int key, unsigned int * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x20) {
+  if (prop->mTypeId == kTypeKey) {
     *out = prop->GetKey()->mInstance;
     return true;
   }
@@ -144,10 +153,10 @@ bool GetPropertyAsKeyInstance(cPropertyList const * list, unsigned int key, unsi
 namespace SP {
 bool GetPropertyAsKeyGroup(cPropertyList const * list, unsigned int key, unsigned int * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x20) {
+  if (prop->mTypeId == kTypeKey) {
     *out = prop->GetKey()->mGroup;
     return true;
   }
@@ -159,10 +168,10 @@ bool GetPropertyAsKeyGroup(cPropertyList const * list, unsigned int key, unsigne
 namespace SP {
 bool GetPropertyAsKeyType(cPropertyList const * list, unsigned int key, unsigned int * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x20) {
+  if (prop->mTypeId == kTypeKey) {
     *out = prop->GetKey()->mType;
     return true;
   }
@@ -174,10 +183,10 @@ bool GetPropertyAsKeyType(cPropertyList const * list, unsigned int key, unsigned
 namespace SP {
 bool GetPropertyAsText(cPropertyList const * list, unsigned int key, cString * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x22) {
+  if (prop->mTypeId == kTypeText) {
     cStringSet(prop->GetText(), out);
     return true;
   }
@@ -189,10 +198,10 @@ bool GetPropertyAsText(cPropertyList const * list, unsigned int key, cString * o
 namespace SP {
 bool GetPropertyAsString8(cPropertyList const * list, unsigned int key, eastl::basic_string<char, eastl::allocator> * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x12) {
+  if (prop->mTypeId == kTypeString8) {
     eastl::basic_string<char,eastl::allocator>* src = prop->GetString8();
     if (src != out) {
       out->assign(src->mpBegin, src->mpEnd);
@@ -207,10 +216,10 @@ bool GetPropertyAsString8(cPropertyList const * list, unsigned int key, eastl::b
 namespace SP {
 bool GetPropertyAsString16(cPropertyList const * list, unsigned int key, eastl::basic_string<wchar_t, eastl::allocator> * out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x13) {
+  if (prop->mTypeId == kTypeString16) {
     eastl::basic_string<wchar_t,eastl::allocator>* src = prop->GetString16();
     if (src != out) {
       out->assign(src->mpBegin, src->mpEnd);
@@ -225,10 +234,10 @@ bool GetPropertyAsString16(cPropertyList const * list, unsigned int key, eastl::
 namespace SP {
 bool GetPropertyAsChar8Ptr(cPropertyList const * list, unsigned int key, char const ** out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x12) {
+  if (prop->mTypeId == kTypeString8) {
     *out = prop->GetString8()->mpBegin;
     return true;
   }
@@ -240,10 +249,10 @@ bool GetPropertyAsChar8Ptr(cPropertyList const * list, unsigned int key, char co
 namespace SP {
 bool GetPropertyAsChar16Ptr(cPropertyList const * list, unsigned int key, wchar_t const ** out)
 {
-  if (list == 0) return false;
+  if (!list) return false;
   EA::Variant const * prop;
   if (!list->GetProperty(key, &prop)) return false;
-  if (prop->mTypeId == 0x13) {
+  if (prop->mTypeId == kTypeString16) {
     *out = prop->GetString16()->mpBegin;
     return true;
   }
