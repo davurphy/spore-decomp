@@ -932,6 +932,18 @@ void* GetVoiceManager();                       // 0xa67d00
 void __stdcall SysGfxStubFree(void* p);        // 0xa67c50 (__stdcall)
 // ---- items of slice s00a670b0 end
 
+// ---- items of slice s00a52080 begin (TODO(rewrite): local stubs, replace by canonical classes)
+struct PairVec { int* begin; int* cur; int* cap; int* alloc;
+  void __thiscall Insert(int pos, unsigned n, int* value);
+  void __thiscall Resize(unsigned n);
+};
+void* __cdecl eastl_copy(void*, void*, void*, void*, void*);         // 0x76ffd0
+void  __cdecl FUN_0073fe50(void*, void*, void*);                     // 0x73fe50
+void  __cdecl FUN_006ac440(void*, unsigned, void*);                  // 0x6ac440
+char* __cdecl FUN_0099efa0(char*, char*, char*);                     // 0x99efa0
+void  __cdecl vector_erase_tail(void*, void*);                       // 0xd018d0
+// ---- items of slice s00a52080 end
+
 // @ 0x00a52da0
 void __cdecl FUN_00a52da0(int* first, int* last, int* value)
 {
@@ -939,6 +951,76 @@ void __cdecl FUN_00a52da0(int* first, int* last, int* value)
     first[0] = value[0];
     first[1] = value[1];
   }
+}
+
+// @ 0x00a52dd0
+void __thiscall PairVec::Insert(int pos, unsigned n, int* value)
+{
+  int cur = (int)this->cur;
+  unsigned cap = (unsigned)(((char*)this->cap - (char*)cur) >> 3);
+  char* pcur = (char*)this->cur;
+  char* pbegin = (char*)this->begin;
+  if (cap < n) {
+    unsigned used = (unsigned)((pcur - pbegin) >> 3);
+    unsigned grow = used * 2;
+    if (used == 0)
+      grow = 1;
+    unsigned want = used + n;
+    if (want < grow)
+      want = grow;
+    char* nb = 0;
+    if (want != 0)
+      nb = (char*)(*(void*(__thiscall**)(unsigned))((char*)alloc + 8))(want * 8);
+    char* p = FUN_0099efa0(pbegin, (char*)pos, nb);
+    {
+      char* q = p;
+      for (unsigned k = n; k != 0; --k) {
+        if (q) {
+          *(int*)(q + 0) = value[0];
+          *(int*)(q + 4) = value[1];
+        }
+        q += 8;
+      }
+    }
+    char* endp = FUN_0099efa0((char*)pos, pcur, p + n * 8);
+    if (this->begin != 0)
+      (*(void(__thiscall**)(int))((char*)alloc + 0xc))((int)this->begin);
+    this->begin = (int*)nb;
+    this->cur = (int*)endp;
+    this->cap = (int*)(nb + want * 8);
+  } else if (n != 0) {
+    int tmp[2];
+    tmp[0] = value[0];
+    tmp[1] = value[1];
+    unsigned tail = (unsigned)((pcur - (char*)pos) >> 3);
+    if (n < tail) {
+      unsigned off = n * 8;
+      char* dst = pcur - off;
+      eastl_copy((void*)pos, dst, pcur, pcur, dst);
+      this->cur = (int*)(pcur + off);
+      FUN_0073fe50((void*)pos, dst, pcur);
+      FUN_00a52da0((int*)pos, (int*)((char*)pos + off), tmp);
+      return;
+    }
+    unsigned extra = n - tail;
+    FUN_006ac440(pcur, extra, tmp);
+    this->cur = (int*)(pcur + extra * 8);
+    eastl_copy((void*)pos, pcur, this->cur, this->cur, (void*)tail);
+    this->cur = (int*)((char*)this->cur + tail * 8);
+    FUN_00a52da0((int*)pos, (int*)pcur, tmp);
+  }
+}
+
+// @ 0x00a52fa0
+void __thiscall PairVec::Resize(unsigned n)
+{
+  unsigned have = (unsigned)(((char*)cur - (char*)begin) >> 3);
+  if (have < n) {
+    int tmp[2];
+    Insert((int)cur, n - have, tmp);
+    return;
+  }
+  vector_erase_tail((void*)((char*)begin + n * 8), (void*)cur);
 }
 
 // @ 0x00a52ff0

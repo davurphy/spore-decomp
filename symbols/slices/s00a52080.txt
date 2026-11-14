@@ -24,7 +24,7 @@
 00a52c80 ?groupsize_symbol@@YAXPADHH@Z  # complete, non-exact
 00a52d00 ?a_group_setup@@YAEXZ  # complete, non-exact
 00a52da0 ?FUN_00a52da0@@YAXPAH00@Z  # FUN_00a52da0 migrated from s00a52080 (verbatim, slice spelling)
-00a52dd0 ?Insert@PairVec@@QAEXHIPAH@Z  # complete, non-exact
+00a52dd0 ?Insert@PairVec@@QAEXHIPAH@Z  # Insert migrated from s00a52080 (verbatim, slice spelling)
 00a52f70 ?Init@GroupHelp@@QAEPAXH@Z  # complete, non-exact
-00a52fa0 ?Resize@PairVec@@QAEXI@Z  # complete, non-exact
+00a52fa0 ?Resize@PairVec@@QAEXI@Z  # Resize migrated from s00a52080 (verbatim, slice spelling)
 ; (manifest.txt rows are byte-exact; the rest are the nonmatching.txt entries)
