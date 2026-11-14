@@ -456,8 +456,53 @@ extern "C" long _InterlockedDecrement(volatile long*);
 static __forceinline void** VtOf(void* p) { return *(void***)p; }
 void* __cdecl FUN_00a206f0(void);                        // EA::Audio::GetSystemAT
 double __cdecl pow(double, double);                      // CRT
-struct Sound_s00a1_a590 {
-    uint8_t  pad000[0x3c];
+struct SoundAttenuation {
+    virtual void Slot00();
+    virtual void Slot01();
+    virtual void Slot02();
+    virtual void Slot03();
+    virtual void Slot04();
+    virtual void Slot05();
+    virtual void Slot06();
+    virtual void Slot07();
+    virtual void Slot08();
+    virtual void Slot09();
+    virtual void Slot10();
+    virtual void Slot11();
+    virtual void Slot12();
+    virtual void Slot13();
+    virtual void Slot14();
+    virtual void Slot15();
+    virtual void Slot16();
+    virtual void Slot17();
+    virtual void Slot18();
+    virtual void Slot19();
+    virtual void Slot20();
+    virtual void Slot21();
+    virtual void Slot22();
+    virtual void Slot23();
+    virtual void Slot24();
+    virtual void Slot25();
+    virtual void Slot26();
+    virtual void Slot27();
+    virtual void Slot28();
+    virtual void Slot29();
+    virtual void Slot30();
+    virtual void Slot31();
+    virtual void Slot32();
+    virtual void Slot33();
+    virtual void Slot34();
+    virtual void Slot35();
+    virtual void Slot36();
+    virtual void Slot37();
+    virtual void Slot38();
+    virtual void Slot39();
+    virtual void Slot40();
+    virtual void Slot41();
+    virtual double Attenuate(float, float, float, float, float);
+};
+struct Sound_s00a1_a590 : SoundAttenuation {
+    uint8_t  pad004[0x38];
     uint32_t mInstanceId;          // +0x03c
     uint8_t  pad040[0x08];
     float    mf48;                 // +0x048
@@ -492,14 +537,14 @@ struct Sound_s00a1_a590 {
     void   Tick(uint32_t a, float dt);  // 0x00a1b230 (Sound::Tick)
 
     bool   IsFlag1();
-    bool   ClearFlag1();
-    void   SetInstanceId(uint32_t id);
-    bool   IsFlag2();
-    bool   IsFlag80();
-    double GetDoubleC8();
+    bool   ClearFlag1();  // 0x00a1acd0 (Sound::ClearFlag1)
+    void   SetInstanceId(uint32_t id);  // 0x00a1ad20 (Sound::SetInstanceId)
+    bool   IsFlag2();  // 0x00a1ad40 (Sound::IsFlag2)
+    bool   IsFlag80();  // 0x00a1ae20 (Sound::IsFlag80)
+    double GetDoubleC8();  // 0x00a1ae40 (Sound::GetDoubleC8)
     double AttnHelper();
-    uint8_t Bit3();
-    bool   PauseStateAllowed(uint32_t idx, char flag);
+    uint8_t Bit3();  // 0x00a1af50 (Sound::Bit3)
+    bool   PauseStateAllowed(uint32_t idx, char flag);  // 0x00a1adc0 (Sound::PauseStateAllowed)
 };
 struct Envelope {
     float    mEnvelope[6];  // +0x00
@@ -915,6 +960,12 @@ bool Sound_s00a1_a590::IsFlag80()
 double Sound_s00a1_a590::GetDoubleC8()
 {
     return *(double*)((char*)this + 0xcc8);
+}
+
+// @ 0x00a1ae50
+double Sound_s00a1_a590::AttnHelper()
+{
+    return Attenuate(mf48, mf50, mf54, mf58, mf98) * mf5c;
 }
 
 // @ 0x00a1ae90

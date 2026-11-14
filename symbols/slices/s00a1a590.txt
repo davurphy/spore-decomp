@@ -10,6 +10,7 @@
 00a1ae00 ?PausedIgnoring@Sound@Audio@EA@@UAE_NI@Z  # EA::Audio::Sound::PausedIgnoring migrated from s00a1a590
 00a1ae20 ?IsFlag80@Sound_s00a1_a590@@QAE_NXZ  # Sound_s00a1_a590::IsFlag80 migrated from s00a1a590 (verbatim, slice spelling)
 00a1ae40 ?GetDoubleC8@Sound_s00a1_a590@@QAENXZ  # Sound_s00a1_a590::GetDoubleC8 migrated from s00a1a590 (verbatim, slice spelling)
+00a1ae50 ?AttnHelper@Sound_s00a1_a590@@QAENXZ  # Sound_s00a1_a590::AttnHelper migrated from s00a1a590 (verbatim, slice spelling)
 00a1ae90 ?RunningAttenuation@Sound_s00a1_a590@@QAENXZ  # Sound_s00a1_a590::RunningAttenuation migrated from s00a1a590 (verbatim, slice spelling)
 00a1aef0 ?RequestStop@Sound_s00a1_a590@@QAEXIE@Z  # Sound_s00a1_a590::RequestStop migrated from s00a1a590 (verbatim, slice spelling)
 00a1af50 ?Bit3@Sound_s00a1_a590@@QAEEXZ  # Sound_s00a1_a590::Bit3 migrated from s00a1a590 (verbatim, slice spelling)
