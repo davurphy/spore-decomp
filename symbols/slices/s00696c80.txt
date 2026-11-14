@@ -3,7 +3,7 @@
 00697960 ?ZeroLocalInputState@@YIPAXPAX@Z  # ZeroLocalInputState migrated from s00696c80 (verbatim, slice spelling)
 00697980 ?Reset@cLocalInputState@SP@@QAEXXZ  # SP::cLocalInputState::Reset migrated from s00696c80
 006979c0 ?UpdateModifiers@cLocalInputState@SP@@QAEXXZ  # SP::cLocalInputState::UpdateModifiers migrated from s00696c80
-00697a10 ?ResetIf@cLocalInputState_s0069_6c80@SP@@QAEX_N@Z  # cLocalInputState_s0069_6c80::ResetIf migrated from s00696c80 (verbatim, slice spelling)
+00697a10 ?OnFocusChange@cLocalInputState@SP@@QAEX_N@Z  # SP::cLocalInputState::OnFocusChange (canonical header; was the slice stub cLocalInputState_s0069_6c80::ResetIf)
 00697a50 ?OnKeyDown@cLocalInputState@SP@@QAEXII@Z  # SP::cLocalInputState::OnKeyDown migrated from s00696c80
 00697a80 ?OnKeyUp@cLocalInputState@SP@@QAEXII@Z  # SP::cLocalInputState::OnKeyUp migrated from s00696c80
 00697ab0 ?OnMouseDown@cLocalInputState@SP@@QAEXIMMI@Z  # SP::cLocalInputState::OnMouseDown migrated from s00696c80
