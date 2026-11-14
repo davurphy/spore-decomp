@@ -1,65 +1,34 @@
-// src/game/SPAudio/eapdclock.cpp -- migrated from slice(s) s00a488d0 by tools/migrate/rewrite.py
-// Object file: SPAudio/eapdclock.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// src/game/SPAudio/eapdclock.cpp -- EA::Audio::Eapd clock (logical time and the ordered timer list).
+// Object file: SPAudio/eapdclock.obj. Each function keeps its '// @ 0xVA' marker.
 
-#include "game/types.h"
-
-// ---- items of slice s00a488d0 begin (TODO(rewrite): local stubs, replace by canonical classes)
 namespace EA {
 namespace Audio {
 namespace Eapd {
+
+// Local layout of a clock. No canonical header declares t_clock yet, so it stays here.
 struct t_clock {
-    double   c_settime;   // +0
-    int      c_set;       // +8
+    double   c_settime;   // +0   time the clock fires (logical seconds)
+    int      c_set;       // +8   0 = idle, 1 = in the list, 2 = paused
     void*    c_owner;     // +0xc
     void*    c_method;    // +0x10
-    t_clock* c_next;      // +0x14
+    t_clock* c_next;      // +0x14 next clock in s_clocklist
 };
-}
-}
-}
-namespace EA {
-namespace Audio {
-namespace Eapd {
-extern t_clock*    s_clocklist;     // 0x1675410
-}
-}
-}
-namespace EA {
-namespace Audio {
-namespace Eapd {
-extern double      s_time;          // 0x1675420
-}
-}
-}
-namespace EA {
-namespace Audio {
-namespace Eapd {
-extern const double s_ctime;        // 0x1454410  (clock_new's initial c_settime constant)
-}
-}
-}
-namespace EA {
-namespace Audio {
-namespace Eapd {
-void* getbytes(int n, const char* tag);                                        // 0xa49610
-}
-}
-}
-namespace EA {
-namespace Audio {
-namespace Eapd {
-void  freebytes(void* p, int n);                                               // 0xa49650
-}
-}
-}
-// ---- items of slice s00a488d0 end
+
+const int kClockBytes = 0x18;               // sizeof(t_clock) in the game's allocator
+const float kMillisecondsToSeconds = 0.001f;
+
+extern t_clock*     s_clocklist;            // 0x1675410  head of the ordered list of set clocks
+extern double       s_time;                 // 0x1675420  logical time
+extern const double s_ctime;                // 0x1454410  initial c_settime for a new clock
+extern const double s_timescale;            // 0x1454428  guess: scale used by clock_gettimesince; value not confirmed
+
+void* getbytes(int n, const char* tag);     // 0xa49610
+void  freebytes(void* p, int n);            // 0xa49650
 
 // @ 0x00a49080
-namespace EA { namespace Audio { namespace Eapd {
 t_clock* clock_new(void* owner, void* fn)
 {
-    t_clock* c = (t_clock*)getbytes(0x18, "clock");
+    t_clock* c = static_cast<t_clock*>(getbytes(kClockBytes, "clock"));
     c->c_settime = s_ctime;
     c->c_set = 0;
     c->c_owner = owner;
@@ -67,10 +36,8 @@ t_clock* clock_new(void* owner, void* fn)
     c->c_next = 0;
     return c;
 }
-}}}  // namespace EA::Audio::Eapd
 
 // @ 0x00a490b0
-namespace EA { namespace Audio { namespace Eapd {
 void clock_unset(t_clock* c)
 {
     if (c->c_set == 1) {
@@ -86,10 +53,9 @@ void clock_unset(t_clock* c)
     }
     c->c_set = 0;
 }
-}}}  // namespace EA::Audio::Eapd
 
 // @ 0x00a490f0
-namespace EA { namespace Audio { namespace Eapd {
+// Not byte-exact yet (see nonmatching.txt). Body kept as the slice wrote it.
 void clock_set(t_clock* c, double systime)
 {
     if (c->c_set == 1)
@@ -113,10 +79,8 @@ void clock_set(t_clock* c, double systime)
         c->c_next = n;
     }
 }
-}}}  // namespace EA::Audio::Eapd
 
 // @ 0x00a49170
-namespace EA { namespace Audio { namespace Eapd {
 void clock_pause(t_clock* c)
 {
     if (c->c_set == 1) {
@@ -126,10 +90,8 @@ void clock_pause(t_clock* c)
         c->c_settime = t;
     }
 }
-}}}  // namespace EA::Audio::Eapd
 
 // @ 0x00a491a0
-namespace EA { namespace Audio { namespace Eapd {
 void clock_unpause(t_clock* c)
 {
     if (c->c_set == 2) {
@@ -138,77 +100,44 @@ void clock_unpause(t_clock* c)
         clock_set(c, t);
     }
 }
-}}}  // namespace EA::Audio::Eapd
 
 // @ 0x00a491d0
-namespace EA { namespace Audio { namespace Eapd {
 bool clock_ispaused(t_clock* c)
 {
     return c->c_set == 2;
 }
-}}}  // namespace EA::Audio::Eapd
 
 // @ 0x00a491e0
-namespace EA { namespace Audio { namespace Eapd {
 void clock_delay(t_clock* c, float delay)
 {
-    clock_set(c, (double)(delay * (float)0.001f) + s_time);
+    clock_set(c, (double)(delay * kMillisecondsToSeconds) + s_time);
 }
-}}}  // namespace EA::Audio::Eapd
 
 // @ 0x00a49210
-namespace EA {
-namespace Audio {
-namespace Eapd {
 double clock_getlogicaltime()
 {
     return s_time;
 }
-}
-}
-}  // namespace EA::Audio::Eapd
 
 // @ 0x00a49220
-namespace EA {
-namespace Audio {
-namespace Eapd {
 double clock_gettimesince(double systime)
 {
-    return (s_time - systime) * *(const double*)0x01454428;
+    return (s_time - systime) * s_timescale;
 }
-}
-}
-}  // namespace EA::Audio::Eapd
 
 // @ 0x00a49240
-namespace EA {
-namespace Audio {
-namespace Eapd {
 double clock_getlogicaltimeafter(float delay)
 {
-    return (double)delay * (float)0.001f + s_time;
+    return (double)delay * kMillisecondsToSeconds + s_time;
 }
-}
-}
-}  // namespace EA::Audio::Eapd
 
 // @ 0x00a49260
-namespace EA { namespace Audio { namespace Eapd {
 void clock_free(t_clock* c)
 {
-    if (c->c_set == 1) {
-        t_clock* o = s_clocklist;
-        if (c == o) {
-            s_clocklist = c->c_next;
-            c->c_set = 0;
-            freebytes(c, 0x18);
-            return;
-        }
-        while (o->c_next != c)
-            o = o->c_next;
-        o->c_next = c->c_next;
-    }
-    c->c_set = 0;
-    freebytes(c, 0x18);
+    clock_unset(c);
+    freebytes(c, kClockBytes);
 }
-}}}  // namespace EA::Audio::Eapd
+
+}  // namespace Eapd
+}  // namespace Audio
+}  // namespace EA

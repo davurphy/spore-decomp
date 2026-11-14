@@ -1,6 +1,7 @@
-// src/game/SPGonzago/SPCinematicManager.cpp -- migrated from slice(s) s005ca070, s0057bfb0, s005718f0, s0042f160, s004292a0, s00423110, s004215f0, s0041dd90 by tools/migrate/rewrite.py
-// Object file: SPGonzago/SPCinematicManager.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// src/game/SPGonzago/SPCinematicManager.cpp
+// Object file: SPGonzago/SPCinematicManager.obj.  Types, members and virtual calls use the canonical headers under
+// src/game/include where they exist; the local stand-ins below are kept until their canonical classes are migrated.
+// Each function keeps its '// @ 0xVA' marker.
 
 #include "game/types.h"
 #include <stdarg.h>
@@ -29,7 +30,6 @@
 #include "cSPUILayout.h"
 #include "SP/cString.h"
 
-// ---- items of slice s0041dd90 begin (TODO(rewrite): local stubs, replace by canonical classes)
 struct WStr {
     const wchar_t* mBegin;
     const wchar_t* mEnd;
@@ -39,9 +39,7 @@ struct WStr {
     int rfind(wchar_t c, uint32_t pos);
     void AppendVPrintf(const wchar_t* fmt, va_list args);   // 0x004234b0
 };
-// ---- items of slice s0041dd90 end
 
-// ---- items of slice s004215f0 begin (TODO(rewrite): local stubs, replace by canonical classes)
 extern char vtbl_App_cLocaleChangeMessage[];     // 0x013eb918
 extern char vtbl_UI_BehaviorMessage[];           // 0x013eb90c
 extern char vtbl_SlotMessage[];                  // 0x013eb844
@@ -60,9 +58,7 @@ struct SlotMessage {
     SlotMessage* Construct(uint32_t arg);
     void Destruct();
 };
-// ---- items of slice s004215f0 end
 
-// ---- items of slice s00423110 begin (TODO(rewrite): local stubs, replace by canonical classes)
 struct WString {
     wchar_t* mpBegin;
     wchar_t* mpEnd;
@@ -86,9 +82,7 @@ struct WString {
     void Append(const wchar_t* first, const wchar_t* last);        // 0x00429580
     void Erase(wchar_t* first, wchar_t* last);                     // 0x0042e2f0
 };
-// ---- items of slice s00423110 end
 
-// ---- items of slice s004292a0 begin (TODO(rewrite): local stubs, replace by canonical classes)
 extern const char g_EditorName[];     // "Editor"
 extern const char g_AllocatorHdr[];   // ".../EASTL/include/EASTL/allocator.h"
 typedef uint16_t wchar16;
@@ -116,9 +110,7 @@ struct WStr_s0042_92a0 {
     WStr_s0042_92a0* Append(const wchar16* first, const wchar16* last);
     void AllocateSelf(uint32_t n);
 };
-// ---- items of slice s004292a0 end
 
-// ---- items of slice s0042f160 begin (TODO(rewrite): local stubs, replace by canonical classes)
 #pragma intrinsic(_InterlockedIncrement)
 struct Alloc {
     uint32_t pad;
@@ -165,9 +157,7 @@ inline uint16_t* UninitializedCopy16(const uint16_t* first, const uint16_t* last
     memcpy(dest, first, (last - first) * 2);
     return dest + (last - first);
 }
-// ---- items of slice s0042f160 end
 
-// ---- items of slice s005718f0 begin (TODO(rewrite): local stubs, replace by canonical classes)
 extern "C" __declspec(dllimport) int __stdcall QueryPerformanceCounter(int64_t* p);
 #define PVCAT2(a, b) a##b
 #define PVCAT(a, b) PVCAT2(a, b)
@@ -208,9 +198,7 @@ struct OwnerHandle {
     OwnerTarget* mpTarget;
     void Notify();
 };
-// ---- items of slice s005718f0 end
 
-// ---- items of slice s0057bfb0 begin (TODO(rewrite): local stubs, replace by canonical classes)
 void* operator new[](size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line);
 void  operator delete[](void* p);
 inline void* operator new(size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
@@ -285,9 +273,7 @@ public:
     int sprintf(const char* fmt, ...);
 };
 }
-// ---- items of slice s0057bfb0 end
 
-// ---- items of slice s005ca070 begin (TODO(rewrite): local stubs, replace by canonical classes)
 #define PV_s005c_a070(n) virtual void pv##n();
 class cAudioSystem {
  public:
@@ -299,7 +285,6 @@ class cAudioSystem {
   virtual void Flush();                    // +0x58
 };
 cAudioSystem* GetSystemAT();  // 0x00a206f0
-// ---- items of slice s005ca070 end
 
 // @ 0x0041e050
 WStr* __cdecl WStr_Format(WStr* s, const wchar_t* fmt, ...)
@@ -483,13 +468,13 @@ template <> eastl::basic_string_s0057_bfb0<wchar_t>& eastl::basic_string_s0057_b
 }
 
 // @ 0x005ca880
-void SetGlobalProperty(int a1, float a2)
+void SetGlobalProperty(int value, float scale)
 {
-  cAudioSystem* sys = GetSystemAT();
-  if (sys) {
-    sys->SetId(0x3cdd1a9);
-    sys->SetInt(0x34753a7, a1);
-    sys->SetFloat(0x34753aa, a2);
-    sys->Flush();
-  }
+    cAudioSystem* sys = GetSystemAT();
+    if (sys) {
+        sys->SetId(0x3cdd1a9);
+        sys->SetInt(0x34753a7, value);
+        sys->SetFloat(0x34753aa, scale);
+        sys->Flush();
+    }
 }

@@ -1,45 +1,36 @@
-// src/game/SPEngine/_at_00670000.cpp -- migrated from slice(s) s0067c450 by tools/migrate/rewrite.py
-// Object file: SPEngine/_at_00670000.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// src/game/SPEngine/_at_00670000.cpp
+// Object file: SPEngine/_at_00670000.obj.
+// D3D9 register helpers and the register-table setup that feeds them.
+// Each function keeps its '// @ 0xVA' marker.
 
-#include "game/types.h"
+// Retail globals used by this module. The name is the slice's own unnamed
+// name; the address is in each comment.
+extern void* g_016f6ed0;   // 0x016f6ed0: constant block (role is a guess)
+extern void* g_016f6eb0;   // 0x016f6eb0
+extern void* g_016f6eb4;   // 0x016f6eb4
+extern float* g_016f6e74;  // 0x016f6e74
+extern float* g_016f6e7c;  // 0x016f6e7c
+extern float* g_016f6e80;  // 0x016f6e80
+extern float* g_016f6e98;  // 0x016f6e98: 12-float constant block
+extern unsigned int g_015fd88c;  // 0x015fd88c: running byte total for FUN_0067d230
 
-// unnamed retail callees and globals (address in the comment)
-extern void* g_016f6ed0;
-extern void* g_016f6eb0;
-extern void* g_016f6eb4;
-extern float* g_016f6e74;
-extern float* g_016f6e7c;
-extern float* g_016f6e80;
-extern float* g_016f6e98;
-extern "C" void FUN_011f4270(int, void*, void*, void*, void*);
-extern "C" void FUN_0067cf20();
-extern unsigned int g_015fd88c;
+// Retail callees (addresses in the names).
+extern "C" void FUN_011f4270(int, void*, void*, void*, void*);  // register-table insert
+extern "C" void FUN_0067cf20();                                  // register-table callback for key 0x241
 
-// ---- items of slice s0067c450 begin (TODO(rewrite): local stubs, replace by canonical classes)
+// Local stand-ins until canonical classes exist for these objects.
+// TODO: replace with the canonical D3D9 device class if one is added to src/game/include.
 typedef void (__stdcall *SRegFn)(void*, void*, void*, int);
-struct SO { SRegFn* vt; };
-extern SO* g_016f89d0;             // D3D9 device object (vtable owner)
-extern void* g_016f6ed0;
-extern void* g_016f6eb0;
-extern void* g_016f6eb4;
-extern float* g_016f6e74;
-extern float* g_016f6e7c;
-extern float* g_016f6e80;
-extern float* g_016f6e98;
-extern "C" void FUN_011f4270(int, void*, void*, void*, void*);
-extern "C" void FUN_0067cf20();
-extern unsigned int g_015fd88c;
-struct Allocator {
+struct D3D9Device {  // name is a guess; only the vtable layout is known
+  SRegFn* vt;
+};
+extern D3D9Device* g_016f89d0;  // 0x016f89d0: D3D9 device object (vtable owner)
+
+struct Allocator {  // name is a guess
   void* Alloc(unsigned int size, int a, int b, int c, int d, int e);
   void Free(void* p);
 };
-extern Allocator* g_16c8b44;
-// ---- items of slice s0067c450 end
-
-// unnamed retail callees and globals that name local stubs (address in the comment)
-extern SO* g_016f89d0;             // D3D9 device object (vtable owner)
-extern Allocator* g_16c8b44;
+extern Allocator* g_16c8b44;  // 0x016c8b44
 
 // @ 0x0067cc70
 void FUN_0067cc70(void* a, void* b, int c)
@@ -123,26 +114,29 @@ void FUN_0067d020(void* a, void* b, int c)
     g_016f89d0->vt[109](g_016f89d0, a, values, 1);
 }
 
+// Argument block passed as the three pointer slots of every register-table insert.
+static void* const kZeroBlock = (void*)0xc2e4e0;  // 0x00c2e4e0
+
 // @ 0x0067d0c0
 void FUN_0067d0c0()
 {
-  FUN_011f4270(0x236, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067d020);
+  FUN_011f4270(0x236, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067d020);
   *(unsigned int*)0x16327c8 = 4;
-  FUN_011f4270(0x238, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0);
+  FUN_011f4270(0x238, kZeroBlock, kZeroBlock, kZeroBlock, (void*)0);
   *(unsigned int*)0x16327d0 = 1;
-  FUN_011f4270(0x233, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067cd20);
+  FUN_011f4270(0x233, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067cd20);
   *(unsigned int*)0x16327bc = 4;
-  FUN_011f4270(0x235, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067cd90);
+  FUN_011f4270(0x235, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067cd90);
   *(unsigned int*)0x16327c4 = 4;
-  FUN_011f4270(0x23c, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067ce00);
+  FUN_011f4270(0x23c, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067ce00);
   *(unsigned int*)0x16327e0 = 0x30;
-  FUN_011f4270(0x241, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067cf20);
+  FUN_011f4270(0x241, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067cf20);
   *(unsigned int*)0x16327f4 = 0x40;
-  FUN_011f4270(0x242, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067cca0);
+  FUN_011f4270(0x242, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067cca0);
   *(unsigned int*)0x16327f8 = 0x40;
-  FUN_011f4270(0x243, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067cce0);
+  FUN_011f4270(0x243, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067cce0);
   *(unsigned int*)0x16327fc = 0x90;
-  FUN_011f4270(0x24a, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)0xc2e4e0, (void*)FUN_0067cc70);
+  FUN_011f4270(0x24a, kZeroBlock, kZeroBlock, kZeroBlock, (void*)FUN_0067cc70);
   *(unsigned int*)0x1632818 = 0x30;
 }
 

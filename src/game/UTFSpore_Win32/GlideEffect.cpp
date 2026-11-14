@@ -1,115 +1,112 @@
-// src/game/UTFSpore_Win32/GlideEffect.cpp -- migrated from slice(s) s0096f3f0 by tools/migrate/rewrite.py
-// Object file: UTFSpore_Win32/GlideEffect.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// src/game/UTFSpore_Win32/GlideEffect.cpp
+// Object file: UTFSpore_Win32/GlideEffect.obj.
 
-#include "game/types.h"
-#include "EA/UTFWin/RenderContext.h"
-#include "EA/UTFWinControls/WinGrid.h"
-#include <intrin.h>
-
-// ---- items of slice s0096f3f0 begin (TODO(rewrite): local stubs, replace by canonical classes)
 namespace EA {
 namespace UTFWinControls {
+
+// No canonical header declares these yet, so they are declared here by their retail addresses.
 int   __cdecl FUN_009512c0();                                                  // 0x009512c0
-}
-}
-namespace EA {
-namespace UTFWinControls {
 void* __cdecl FUN_009512d0(int size, int align, const char* type, void* fac);  // 0x009512d0
-}
-}
-namespace EA {
-namespace UTFWinControls {
 void  __fastcall FadeEffect_ctor(void*);                                       // 0x00963db0
-}
-}
-namespace EA {
-namespace UTFWinControls {
+
 struct FloatSink {
-    void Push(float* v);          // 0x0095e890
+    void Push(float* v);  // 0x0095e890
 };
-}
-}
-namespace EA {
-namespace UTFWinControls {
-class GlideEffect { public:
-    char  pad00[0x60];
-    void* field60;         // +0x60
-    float field64;         // +0x64
-    float field68;         // +0x68
+
+// Layout is partial: only the offsets this file touches are named (size 0x70).
+// The vtable slots at +0x00, +0x04 and +0x0c are guesses at their owning bases.
+class GlideEffect {
+public:
+    void* mVtbl00;                      // +0x00
+    union {
+        void* mVtbl04;                  // +0x04: the constructor stores a vtable pointer here
+        float mSrcX;                    // +0x04: Set() stores src[0] here
+    };
+    float mSrcY;                        // +0x08: Set() stores src[1] here
+    void* mVtbl0C;                      // +0x0c
+    char  pad10[0x60 - 0x10];
+    void* volatile mVtbl60;             // +0x60: the constructor stores two vtables here, in order
+    float mScaleX;                      // +0x64
+    float mScaleY;                      // +0x68
 
     void Set(float* src);                              // 0x00970060
-    void Scale(void* a, FloatSink* obj, float scale);  // 0x00970010
+    void Scale(void* unused, FloatSink* sink, float scale);  // 0x00970010
 };
-}
-}
+
+class BasicFactory_GlideEffect {
+public:
+    void* CreateInstance(int unused, void* allocator);  // 0x00970100
+};
+
+}  // namespace UTFWinControls
+}  // namespace EA
+
 namespace EA {
 namespace UTFWinControls {
-class BasicFactory_GlideEffect { public:
-    void* CreateInstance(int param1, void* param2);
-};
-}
-}
-// ---- items of slice s0096f3f0 end
+
+// Vtable addresses stored by the constructor, in the order the retail code writes them.
+static const unsigned int kVtblBase60     = 0x014426a0;
+static const unsigned int kVtblBase00     = 0x014425d8;
+static const unsigned int kVtblBase04     = 0x014425c0;
+static const unsigned int kVtblBase0C     = 0x01442584;
+static const unsigned int kVtblFinal60    = 0x014426bc;
 
 // @ 0x00970010
-namespace EA { namespace UTFWinControls {
-void GlideEffect::Scale(void*, FloatSink* obj, float scale)
+void GlideEffect::Scale(void*, FloatSink* sink, float scale)
 {
     float local[3];
-    local[0] = *(float*)((char*)this + 0x64) * scale;
-    local[1] = *(float*)((char*)this + 0x68) * scale;
+    local[0] = mScaleX * scale;
+    local[1] = mScaleY * scale;
     local[2] = 0.0f;
-    obj->Push(local);
+    sink->Push(local);
 }
-}}  // namespace EA::UTFWinControls
 
 // @ 0x00970060
-namespace EA { namespace UTFWinControls {
 void GlideEffect::Set(float* src)
 {
-    *(float*)((char*)this + 4) = src[0];
-    *(float*)((char*)this + 8) = src[1];
+    mSrcX = src[0];
+    mSrcY = src[1];
 }
-}}  // namespace EA::UTFWinControls
+
+// Constructor body. CreateInstance repeats these stores inline: moving them into a shared helper changes the
+// retail codegen, so the two copies stay separate.
 
 // @ 0x009700b0
-namespace EA { namespace UTFWinControls {
-void* __fastcall FUN_009700b0(char* param_1)
+void* __fastcall FUN_009700b0(char* self)
 {
-    FadeEffect_ctor(param_1);
+    FadeEffect_ctor(self);
     const float zero = 0.0f;
-    *(void* volatile*)(param_1 + 0x60) = (void*)0x014426a0;
-    *(void**)(param_1 + 0) = (void*)0x014425d8;
-    *(void**)(param_1 + 4) = (void*)0x014425c0;
-    *(void**)(param_1 + 0x0c) = (void*)0x01442584;
-    *(void* volatile*)(param_1 + 0x60) = (void*)0x014426bc;
-    *(float*)(param_1 + 0x64) = zero;
-    *(float*)(param_1 + 0x68) = zero;
-    return param_1;
+    *(void* volatile*)(self + 0x60) = (void*)kVtblBase60;
+    *(void**)(self + 0x00) = (void*)kVtblBase00;
+    *(void**)(self + 0x04) = (void*)kVtblBase04;
+    *(void**)(self + 0x0c) = (void*)kVtblBase0C;
+    *(void* volatile*)(self + 0x60) = (void*)kVtblFinal60;
+    *(float*)(self + 0x64) = zero;
+    *(float*)(self + 0x68) = zero;
+    return self;
 }
-}}  // namespace EA::UTFWinControls
 
 // @ 0x00970100
-namespace EA { namespace UTFWinControls {
-void* BasicFactory_GlideEffect::CreateInstance(int, void* param2)
+void* BasicFactory_GlideEffect::CreateInstance(int, void* allocator)
 {
-    if (param2 == 0)
-        param2 = (void*)FUN_009512c0();
+    if (allocator == 0)
+        allocator = (void*)FUN_009512c0();
     char* obj = (char*)FUN_009512d0(0x70, 8,
-                                    "UTFWin/EA::UTFWinControls::GlideEffect", param2);
+                                    "UTFWin/EA::UTFWinControls::GlideEffect", allocator);
     if (obj != 0) {
         FadeEffect_ctor(obj);
         const float zero = 0.0f;
-        *(void* volatile*)(obj + 0x60) = (void*)0x014426a0;
-        *(void**)(obj + 0) = (void*)0x014425d8;
-        *(void**)(obj + 4) = (void*)0x014425c0;
-        *(void**)(obj + 0x0c) = (void*)0x01442584;
-        *(void* volatile*)(obj + 0x60) = (void*)0x014426bc;
+        *(void* volatile*)(obj + 0x60) = (void*)kVtblBase60;
+        *(void**)(obj + 0x00) = (void*)kVtblBase00;
+        *(void**)(obj + 0x04) = (void*)kVtblBase04;
+        *(void**)(obj + 0x0c) = (void*)kVtblBase0C;
+        *(void* volatile*)(obj + 0x60) = (void*)kVtblFinal60;
         *(float*)(obj + 0x64) = zero;
         *(float*)(obj + 0x68) = zero;
         return obj;
     }
     return 0;
 }
-}}  // namespace EA::UTFWinControls
+
+}  // namespace UTFWinControls
+}  // namespace EA

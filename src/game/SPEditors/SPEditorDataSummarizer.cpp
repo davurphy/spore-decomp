@@ -9,31 +9,17 @@
 #include "EA/Stopwatch.h"
 #include "EA/Allocator/ZoneObject.h"
 #include "SP/FunctionalMatch/DeclareParam.h"
-#include <math.h>
 #include "EA/ResourceMan/DatabasePackedFile.h"
 #include "EA/ResourceMan/PFRecordRead.h"
 #include "EA/ResourceMan/Key.h"
 
-// unnamed retail callees and globals (address in the comment)
-extern "C" long _InterlockedExchange(volatile long*, long);
-extern "C" unsigned int strlen(const char*);
-extern "C" int memcmp(const void*, const void*, unsigned int);
-#pragma intrinsic(_InterlockedExchange)
-#pragma intrinsic(strlen, memcmp)
-
-// ---- items of slice s00555bc0 begin (TODO(rewrite): local stubs, replace by canonical classes)
+// Summarizer classes. The canonical headers do not declare these, so they stay local for now.
 namespace SP {
 class cVehicleModelSummarizer {
 public:
     uint32_t GetResType(int arg);
 };
 }
-// ---- items of slice s00555bc0 end
-
-// ---- items of slice s005567e0 begin (TODO(rewrite): local stubs, replace by canonical classes)
-extern "C" double __cdecl fabs(double);
-#pragma warning(disable: 4100 4189)
-#pragma intrinsic(fabs)
 namespace SP {
 class cBuildingModelSummarizer {
 public:
@@ -49,9 +35,7 @@ public:
 };
 }
 }
-// ---- items of slice s005567e0 end
-
-// ---- items of slice s005570d0 begin (TODO(rewrite): local stubs, replace by canonical classes)
+// Constructor vtables (addresses in the comments).
 extern char g_vtbl_Summarizer[];        // 0x013ec458
 extern char g_vtbl_ScalarDeleting[];    // 0x013f0958
 extern char g_vtbl_SummarizerFinal[];   // 0x013f4274
@@ -177,9 +161,7 @@ inline bool operator==(const ResourceKey& a, const ResourceKey& b)
 }
 }
 }
-// ---- items of slice s005570d0 end
-
-// ---- items of slice s005580e0 begin (TODO(rewrite): local stubs, replace by canonical classes)
+// Stand-ins for eastl, the resource manager and the functional-match types used by ExtractParameters.
 template<int N> inline void ScratchSlots() { uint32_t s[N]; }
 namespace eastl {
 struct allocator_tag { allocator_tag() {} };
@@ -407,7 +389,6 @@ public:
     bool ExtractParameters(const ResourceKey_s0055_80e0& key, eastl::vector_s0055_80e0<DeclareParam_s0055_80e0, eastl::sp_vector_allocator_s0055_80e0>& params);
 };
 }
-// ---- items of slice s005580e0 end
 
 // @ 0x005567c0
 namespace SP {

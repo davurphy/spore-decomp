@@ -1,22 +1,38 @@
-// src/game/SPGonzago/_at_00d40000.cpp -- migrated from slice(s) s00d48010 by tools/migrate/rewrite.py
-// Object file: SPGonzago/_at_00d40000.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// src/game/SPGonzago/_at_00d40000.cpp
+// Object file: SPGonzago/_at_00d40000.obj.
 
 #include "game/types.h"
 
-// ---- items of slice s00d48010 begin (TODO(rewrite): local stubs, replace by canonical classes)
-void operator delete[](void* p);   // 0x00f47380
-int GetCurrentGameMode();                            // 0x00b5b800
+// Local stand-ins for classes that have no canonical header yet. Each one names the retail address it describes.
+// Replace them with the real class header once it exists.
+
+void operator delete(void* p);                                              // 0x00f47380
+void* operator new(uint32_t size, const char* name, int, int, int, int);   // 0x00f473a0
+int GetCurrentGameMode();                                                   // 0x00b5b800
+void* GetAbilityUser();                                                     // 0x00d1e610 (unnamed retail callee)
+void UseAbility(void* user, int index);                                     // 0x00d1e930
+void ActivateAbilityTarget(int index);                                      // 0x00d1fe00
+
+// Game modes compared in InitButtonTable and SelectAbility.
+enum
+{
+    kGameModeCreatureEditor = 0x1654c01,   // creature editor / creature game
+    kGameModeCreatureGame   = 0x1654c10,
+    kGameModeTribeStage     = 0x1654c02,   // tribe/civ stage
+};
+
 struct ButtonEntry
 {
     int32_t mID;          // +0x00 (-1 = unused slot)
     uint8_t mFlag;        // +0x04
     uint8_t pad05[3];     // +0x05
 };
+
 struct ButtonCategory
 {
     ButtonEntry mEntries[5];   // +0x00 .. +0x27
 };
+
 struct ButtonTable
 {
     union
@@ -29,9 +45,9 @@ struct ButtonTable
     uint32_t mBase0;                      // +0x0d0 (first id of categories 0/1)
     uint32_t mBase1;                      // +0x0d4 (first id of categories 3/4)
 };
+
 extern ButtonTable* gButtonTable;         // 0x0169e3ec
-void operator delete(void* p);                                    // 0x00f47380
-void* operator new(uint32_t size, const char* name, int, int, int, int);   // 0x00f473a0
+
 struct WString
 {
     wchar_t* mpBegin;        // +0
@@ -41,11 +57,13 @@ struct WString
     WString& assign(const wchar_t* s);                            // 0x005c3d90 (ret 4)
     WString& Assign(const wchar_t* first, const wchar_t* last);   // 0x00423650 (ret 8)
 };
+
 class cSpeciesProfile
 {
 public:
     void GetUiName(WString* out);            // 0x004da330 (ret 4)
 };
+
 class cCivTokenTranslator
 {
 public:
@@ -53,6 +71,7 @@ public:
     virtual bool TranslateToken(const wchar_t* token, WString* out); // 0x00b324f0 (ret 8)
     uint32_t pad04[2];                                               // +0x04 .. +0x0b
 };
+
 class cCreatureTokenTranslator : public cCivTokenTranslator
 {
 public:
@@ -70,13 +89,6 @@ public:
 
     bool TranslateToken(const wchar_t* token, WString* out);         // 0x00d48750
 };
-void* FUN_00d1e610();                                     // 0x00d1e610
-void UseAbility(void* user, int index);                    // 0x00d1e930
-void ActivateAbilityTarget(int index);                     // 0x00d1fe00
-// ---- items of slice s00d48010 end
-
-// unnamed retail callees and globals that name local stubs (address in the comment)
-extern ButtonTable* gButtonTable;         // 0x0169e3ec
 
 // @ 0x00d486f0
 cCreatureTokenTranslator::cCreatureTokenTranslator()
@@ -90,21 +102,22 @@ void InitButtonTable()
     gButtonTable = (ButtonTable*)operator new(0xd8, "Simulator", 0, 0, 0, 0);
     switch (GetCurrentGameMode())
     {
-    case 0x1654c01:                         // creature editor / creature game
-    case 0x1654c10:
+    case kGameModeCreatureEditor:
+    case kGameModeCreatureGame:
         gButtonTable->mFieldC8 = 5;
         gButtonTable->mCategoryCount = 5;
         gButtonTable->mBase0 = 0x1012010;
         gButtonTable->mBase1 = 0x1012020;
         break;
 
-    case 0x1654c02:                         // tribe/civ stage
+    case kGameModeTribeStage:
         gButtonTable->mFieldC8 = 5;
         gButtonTable->mCategoryCount = 3;
         gButtonTable->mBase0 = 0x1012060;
         gButtonTable->mBase1 = 0x1012050;
         break;
     }
+
     ButtonTable* t = gButtonTable;
     for (int i = 0; i < 0x19; ++i)
     {
@@ -124,16 +137,18 @@ void FreeButtonTable()
 // @ 0x00d48b00
 void SelectAbility(int index)
 {
-    void* user = FUN_00d1e610();
-    if (user != 0)
+    void* user = GetAbilityUser();
+    if (user == 0)
+        return;
+
+    // Slot 0xb0 of the user's vtable returns the number of abilities it offers.
+    const int kAbilityCountSlotOffset = 0xb0;
+    int count = ((int (__thiscall*)(void*))(*(void***)user)[kAbilityCountSlotOffset / 4])(user);
+    if (index < count)
     {
-        int count = ((int (__thiscall*)(void*))(*(void***)user)[0xb0 / 4])(user);
-        if (index < count)
-        {
-            UseAbility(user, index);
-            return;
-        }
-        if (GetCurrentGameMode() == 0x1654c02)
-            ActivateAbilityTarget(index - count);
+        UseAbility(user, index);
+        return;
     }
+    if (GetCurrentGameMode() == kGameModeTribeStage)
+        ActivateAbilityTarget(index - count);
 }

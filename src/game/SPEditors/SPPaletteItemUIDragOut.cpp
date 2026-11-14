@@ -1,25 +1,11 @@
-// src/game/SPEditors/SPPaletteItemUIDragOut.cpp -- migrated from slice(s) s005ee480 by tools/migrate/rewrite.py
-// Object file: SPEditors/SPPaletteItemUIDragOut.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// SP::cSPPaletteItemUIDrag: the drag-out palette item UI (its swatch follows the cursor).
+// Each function keeps its '// @ 0xVA' marker.
 
 #include "game/types.h"
-#include "EA/Messaging/AutoHandler.h"
-#include "EA/Messaging/IHandler.h"
-#include "EA/ResourceMan/Key.h"
-#include "EA/Stopwatch.h"
-#include "SP/cISPPaletteItemUI.h"
-#include "SP/cSPPaletteInfo.h"
-#include "SP/cSPPaletteItem.h"
-#include "SP/cSPPaletteItemUI.h"
-#include "SP/cSPPaletteItemUIOneClickPaint.h"
-#include "SP/cSPPaletteItemUISelectable.h"
-#include "SP/cSPSwatch.h"
-#include "cSPUILayout.h"
-#include "cSPUIPropertyLayout.h"
-#include <new>
-#include <intrin.h>
 
-// ---- items of slice s005ee480 begin (TODO(rewrite): local stubs, replace by canonical classes)
+// Local stand-ins for the types below. The names keep their slice suffix because the
+// mangled names in manifest.txt spell them, so renaming them would change the symbols.
+// Vtable slots that are not used here are padded with PV(n) so the slots line up with retail.
 #define PV(n) virtual void pv##n();
 namespace EA {
 template <typename T>
@@ -287,8 +273,6 @@ class cSPPaletteItemUIDrag : public cSPPaletteItemUI_s005e_e480 {
   AutoRefCount_s005e_e480<cSPSwatch_s005e_e480> mSwatch;  // +0x20
 };
 }
-// ---- items of slice s005ee480 end
-
 // @ 0x005ee500
 namespace SP {
 void* cSPPaletteItemUIDrag::Cast(uint32_t typeID) const
@@ -332,7 +316,7 @@ void cSPPaletteItemUIDrag::Shutdown()
 {
   if (mSwatch) {
     GetEditorUI()->RemoveContent(mSwatch);
-    mSwatch.AsOutParam();
+    mSwatch = 0;
   }
   cSPPaletteItemUI_s005e_e480::Shutdown();
 }
@@ -342,7 +326,8 @@ void cSPPaletteItemUIDrag::Shutdown()
 namespace SP {
 void cSPPaletteItemUIDrag::OnSelected()
 {
-  if (mWinRoot) mWinRoot->SetShadeColor(0x8800bbbb);
+  const uint32_t kSelectedShade = 0x8800bbbb;  // translucent teal
+  if (mWinRoot) mWinRoot->SetShadeColor(kSelectedShade);
   Trigger();
 }
 }  // namespace SP
@@ -351,6 +336,7 @@ void cSPPaletteItemUIDrag::OnSelected()
 namespace SP {
 void cSPPaletteItemUIDrag::OnDeselected()
 {
-  if (mWinRoot) mWinRoot->SetShadeColor(0xffffff);
+  const uint32_t kNoShade = 0xffffff;  // white: no tint
+  if (mWinRoot) mWinRoot->SetShadeColor(kNoShade);
 }
 }  // namespace SP

@@ -1,109 +1,75 @@
-// src/game/UTFSpore_Win32/EAFileUtil.cpp -- migrated from slice(s) s00931460 by tools/migrate/rewrite.py
-// Object file: UTFSpore_Win32/EAFileUtil.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// src/game/UTFSpore_Win32/EAFileUtil.cpp
+// Object file: UTFSpore_Win32/EAFileUtil.obj. EA::IO::File and EA::IO::Directory helpers over the Win32 API.
+// Each function keeps its '// @ 0xVA' marker.
 
 #include "game/types.h"
-#include "EA/IO/FileStream.h"
 
-// unnamed retail callees and globals (address in the comment)
-extern wchar_t gTempPath[];   // 0x01668f28 cached temp path (empty until first use)
 #include <windows.h>
-#include <string.h>
-#include <wchar.h>
 #include <direct.h>
 #include <sys/stat.h>
+#include <wchar.h>
 
-// ---- items of slice s00931460 begin (TODO(rewrite): local stubs, replace by canonical classes)
-struct FixedPathString {
-    wchar_t* mpBegin;      // +0x00
-    wchar_t* mpEnd;        // +0x04
-    wchar_t* mpCapacity;   // +0x08
-    int      mAllocPad;    // +0x0c
-    wchar_t* mpFixed;      // +0x10  the in-object buffer
-    wchar_t  mBuffer[260]; // +0x14
+// Cached temp path, empty until GetTempDirectoryPath first fills it.
+extern wchar_t gTempPath[];   // 0x01668f28
 
-    FixedPathString() {
-        mpBegin = mBuffer;
-        mpEnd = mBuffer;
-        mpCapacity = mBuffer + 260;
-        mpFixed = mBuffer;
-        mBuffer[0] = 0;
-    }
-    void assign(const wchar_t* b, const wchar_t* e);           // 0x0088c3d0
-    void make_lower();                                         // 0x005e8e80
-    void erase(unsigned pos, unsigned n);                      // 0x008e3a70
-    void DeallocateSelf() {
-        wchar_t* b = mpBegin;
-        if ((int)((int)mpCapacity - (int)b & 0xfffffffeU) > 2 && b && b != mpFixed)
-            operator delete[](b);
-    }
-};
-bool operator==(const FixedPathString& s, const wchar_t* p);   // 0x006ab760
-static __forceinline int StrLenDo(const wchar_t* s) { return (int)wcslen(s); }
-extern wchar_t gTempPath[];   // 0x01668f28 cached temp path (empty until first use)
+// Appends a path separator when missing. Defined at 0x0092fe00 (EAFilePath.cpp).
 bool EnsureTrailingPathSeparator(wchar_t* path, int len);
-// ---- items of slice s00931460 end
+
+// Win32 constants the bodies below name. Values are the ones the retail code uses.
+namespace {
+const DWORD kTempBufferChars = 0x100;        // GetTempPathW / GetLongPathNameW buffer
+const int kCwdBufferChars = 0xff;            // _wgetcwd buffer
+const DWORD kMoveReplaceAndCopy = 3;         // MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED
+
+// SetAttributes mask bits. The names are guesses from the bit values; the bodies match regardless.
+const int kMaskWritable = 0x2;               // guess: clears or sets FILE_ATTRIBUTE_READONLY, inverted
+const int kMaskUnsupportedA = 0x8;           // returns false
+const int kMaskUnsupportedB = 0x10;          // returns false
+const int kMaskArchive = 0x20;               // guess: FILE_ATTRIBUTE_ARCHIVE
+const int kMaskHidden = 0x40;                // guess: FILE_ATTRIBUTE_HIDDEN
+const int kMaskSystem = 0x80;                // guess: FILE_ATTRIBUTE_SYSTEM
+
+// GetTime selector. The names are guesses from the stat fields read.
+const int kTimeCreate = 1;                   // st_ctime
+const int kTimeModify = 2;                   // st_mtime
+const int kTimeAccess = 4;                   // st_atime
+}  // namespace
 
 // @ 0x00931fa0
 namespace EA {
 namespace IO {
 namespace File {
+
 bool Exists(wchar_t const * path)
 {
     if (!path || !*path)
         return false;
     DWORD a = GetFileAttributesW(path);
-    return a != 0xffffffff && (a & 0x10) == 0 ? 1 : 0;
+    return a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
-}
-}
-}  // namespace EA::IO::File
 
 // @ 0x00931fd0
-namespace EA {
-namespace IO {
-namespace File {
 bool Remove(wchar_t const * path)
 {
     return DeleteFileW(path) != 0;
 }
-}
-}
-}  // namespace EA::IO::File
 
 // @ 0x00931ff0
-namespace EA {
-namespace IO {
-namespace File {
 bool Move(wchar_t const * from, wchar_t const * to, bool overwrite)
 {
     if (!overwrite && to && *to) {
         DWORD a = GetFileAttributesW(to);
-        if (a != 0xffffffff && (a & 0x10) == 0)
+        if (a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY) == 0)
             return false;
     }
-    return MoveFileExW(from, to, 3) != 0;
+    return MoveFileExW(from, to, kMoveReplaceAndCopy) != 0;
 }
-}
-}
-}  // namespace EA::IO::File
-
-// @ 0x00932030
-namespace File {
-bool Copy(const wchar_t* from, const wchar_t* to, bool overwrite)
-{
-    return CopyFileW(from, to, overwrite == 0) != 0;
-}
-}  // namespace File
 
 // @ 0x00932060
-namespace EA {
-namespace IO {
-namespace File {
 unsigned int GetSize(wchar_t const * path)
 {
     WIN32_FIND_DATAW fd;
-    DWORD size = 0xffffffff;
+    DWORD size = INVALID_FILE_SIZE;
     HANDLE h = FindFirstFileW(path, &fd);
     if (h != INVALID_HANDLE_VALUE) {
         size = fd.nFileSizeLow;
@@ -111,65 +77,66 @@ unsigned int GetSize(wchar_t const * path)
     }
     return size;
 }
-}
-}
-}  // namespace EA::IO::File
 
 // @ 0x009320a0
-namespace EA {
-namespace IO {
-namespace File {
 bool SetAttributes(wchar_t const * path, int mask, bool set)
 {
     DWORD orig = GetFileAttributesW(path);
     DWORD a = orig;
-    if (mask & 2) {
+    if (mask & kMaskWritable) {
         if (set)
-            a &= 0xfffffffe;
+            a &= ~FILE_ATTRIBUTE_READONLY;
         else
-            a |= 1;
+            a |= FILE_ATTRIBUTE_READONLY;
     }
-    if (mask & 8)
+    if (mask & kMaskUnsupportedA)
         return false;
-    if (mask & 0x10)
+    if (mask & kMaskUnsupportedB)
         return false;
-    if (mask & 0x20) {
+    if (mask & kMaskArchive) {
         if (set)
-            a |= 0x20;
+            a |= FILE_ATTRIBUTE_ARCHIVE;
         else
-            a &= 0xffffffdf;
+            a &= ~FILE_ATTRIBUTE_ARCHIVE;
     }
-    if (mask & 0x40) {
+    if (mask & kMaskHidden) {
         if (set)
-            a |= 2;
+            a |= FILE_ATTRIBUTE_HIDDEN;
         else
-            a &= 0xfffffffd;
+            a &= ~FILE_ATTRIBUTE_HIDDEN;
     }
-    if (mask & 0x80) {
+    if (mask & kMaskSystem) {
         if (set)
-            a |= 4;
+            a |= FILE_ATTRIBUTE_SYSTEM;
         else
-            a &= 0xfffffffb;
+            a &= ~FILE_ATTRIBUTE_SYSTEM;
     }
     if (a == orig)
         return true;
     return SetFileAttributesW(path, a) != 0;
 }
+
+}  // namespace File
+}  // namespace IO
+}  // namespace EA
+
+// @ 0x00932030
+namespace File {
+bool Copy(const wchar_t* from, const wchar_t* to, bool overwrite)
+{
+    return CopyFileW(from, to, !overwrite) != 0;
 }
-}
-}  // namespace EA::IO::File
 
 // @ 0x00932130
-namespace File {
 int64_t GetTime(const wchar_t* path, int type)
 {
     struct _stat64i32 st;
     if (_wstat64i32(path, &st) == 0) {
-        if (type == 1)
+        if (type == kTimeCreate)
             return st.st_ctime;
-        if (type == 2)
+        if (type == kTimeModify)
             return st.st_mtime;
-        if (type == 4)
+        if (type == kTimeAccess)
             return st.st_atime;
     }
     return 0;
@@ -186,9 +153,9 @@ int GetTempDirectoryPath(wchar_t* out)
         } while ((*d++ = *s++) != 0);
         return (int)wcslen(out);
     }
-    DWORD n = GetTempPathW(0x100, out);
+    DWORD n = GetTempPathW(kTempBufferChars, out);
     if (n != 0) {
-        n = GetLongPathNameW(out, out, 0x100);
+        n = GetLongPathNameW(out, out, kTempBufferChars);
         if (EnsureTrailingPathSeparator(out, -1))
             n = n + 1;
         return n;
@@ -201,10 +168,10 @@ namespace EA {
 namespace IO {
 int GetDriveSerialNumber(wchar_t const * path, wchar_t * out)
 {
-    wchar_t volume[260];
+    wchar_t volume[MAX_PATH];
     DWORD serial;
     DWORD flags;
-    if (GetVolumePathNameW(path, volume, 260) &&
+    if (GetVolumePathNameW(path, volume, MAX_PATH) &&
         GetVolumeInformationW(volume, 0, 0, &serial, 0, &flags, 0, 0)) {
         wsprintfW(out, L"%04X-%04X", serial >> 16, serial & 0xffff);
         return 10;
@@ -212,8 +179,24 @@ int GetDriveSerialNumber(wchar_t const * path, wchar_t * out)
     *out = 0;
     return 0;
 }
+}  // namespace IO
+}  // namespace EA
+
+// @ 0x00932370
+namespace EA {
+namespace IO {
+namespace Directory {
+int GetCurrentWorkingDirectory(wchar_t * out)
+{
+    if (_wgetcwd(out, kCwdBufferChars)) {
+        EnsureTrailingPathSeparator(out, -1);
+        return (int)wcslen(out);
+    }
+    return -1;
 }
-}  // namespace EA::IO
+}  // namespace Directory
+}  // namespace IO
+}  // namespace EA
 
 // @ 0x009322b0
 namespace Directory {
@@ -222,7 +205,7 @@ bool Exists(const wchar_t* path)
     if (!path || !*path)
         return false;
     DWORD a = GetFileAttributesW(path);
-    return a != 0xffffffff && (a & 0x10) ? 1 : 0;
+    return a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 }  // namespace Directory
 
@@ -240,19 +223,3 @@ bool DirectoryCreate(const wchar_t* path)
     }
     return false;
 }
-
-// @ 0x00932370
-namespace EA {
-namespace IO {
-namespace Directory {
-int GetCurrentWorkingDirectory(wchar_t * out)
-{
-    if (_wgetcwd(out, 0xff)) {
-        EnsureTrailingPathSeparator(out, -1);
-        return StrLenDo(out);
-    }
-    return -1;
-}
-}
-}
-}  // namespace EA::IO::Directory

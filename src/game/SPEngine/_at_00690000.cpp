@@ -1,51 +1,47 @@
-// src/game/SPEngine/_at_00690000.cpp -- migrated from slice(s) s0069d090, s0069b910, s00696c80, s00695140, s006925c0 by tools/migrate/rewrite.py
-// Object file: SPEngine/_at_00690000.obj.  Function bodies keep the slice's code; types, members and virtual calls use the
-// canonical headers under src/game/include.  Each function keeps its '// @ 0xVA' marker.
+// src/game/SPEngine/_at_00690000.cpp
+// Object file: SPEngine/_at_00690000.obj.  Each function keeps its '// @ 0xVA' marker.
 
 #include "game/types.h"
-
-// unnamed retail callees and globals (address in the comment)
-extern "C" __declspec(dllimport) double __cdecl strtod(const char*, char**);
-#include <new>
-#include <intrin.h>
-#include <wchar.h>
-#include "EA/CommandLine.h"
-#include "EA/Thread/Mutex.h"
-#include "EA/Trace/Server.h"
 #include <string.h>
-#include "EA/Variant.h"
 
-// ---- items of slice s006925c0 begin (TODO(rewrite): local stubs, replace by canonical classes)
+// Retail callees with no canonical header yet (addresses in the comments).
 extern "C" __declspec(dllimport) double __cdecl strtod(const char*, char**);
+extern "C" void* memcpy(void*, const void*, unsigned int);
+extern "C" void* copy_705250(const void*, const void*, void*);  // 0x00705250
+extern "C" void FUN_0067e070(int x);                            // 0x0067e070
+extern "C" void FUN_00883780();                                 // 0x00883780
 __declspec(noinline) void* FUN_00920090();
+
+// Vtable slot lookup: VFN(obj, byteOffset) yields the function pointer at that slot.
+#define VFN(o, off) (*(void***)(o))[(off) / 4]
+
+// Local stand-ins for classes whose canonical headers do not exist yet (TODO: replace with the real classes).
 struct cSerializerStatus {
     char mPad00[0x24];
-    int mCount;     // +0x24
-    int mReady;     // +0x28
+    int mCount;             // +0x24
+    int mReady;             // +0x28
     bool IsReady() const;
 };
+
 struct cSerializerDispatcher {
+    typedef void* (*GetContextFn)(void* self);
+    typedef unsigned int (*CallbackFn)(void* a, void* b, void* ctx);
+
     char mPad00[0x20];
-    void* mpGetContext;     // +0x20
+    GetContextFn mpGetContext;  // +0x20
     char mPad24[0x14];
-    void* mpCallback;       // +0x38
+    CallbackFn mpCallback;      // +0x38
     unsigned char Dispatch(void* a, void* b);
 };
+
 struct cSerializerLazy {
     char mPad00[8];
     void* mpContext;        // +0x08
     bool mbDone;            // +0x0c
     bool Resolve();
 };
-// ---- items of slice s006925c0 end
 
-// ---- items of slice s00695140 begin (TODO(rewrite): local stubs, replace by canonical classes)
-extern "C" void FUN_0067e070(int x);   // 0x67e070
-extern "C" void FUN_00883780();        // 0x883780
-#define VFN(o,off) (*(void***)(o))[(off)/4]
-// ---- items of slice s00695140 end
-
-// ---- items of slice s0069b910 begin (TODO(rewrite): local stubs, replace by canonical classes)
+// OBB helpers for FUN_0069b910 (nonmatching; see nonmatching.txt).
 struct Shape {
     unsigned short flags;   // +0  bit1 => apply orientation
     unsigned short pad;     // +2
@@ -53,6 +49,7 @@ struct Shape {
     float scale;            // +16
     float m[9];             // +20 orientation, rows m[0..2], m[3..5], m[6..8]
 };
+
 static inline void XForm(const Shape* s, float x, float y, float z, float* o)
 {
     float tx = x;
@@ -67,6 +64,7 @@ static inline void XForm(const Shape* s, float x, float y, float z, float* o)
     o[1] = s->base[1] + ty * s->scale;
     o[2] = s->base[2] + tz * s->scale;
 }
+
 static inline void Proj4A(const float* p, float v0, float v1, float v2, float len2,
                           float& mn, float& mx)
 {
@@ -77,6 +75,7 @@ static inline void Proj4A(const float* p, float v0, float v1, float v2, float le
         if (r < mn) mn = r;
     }
 }
+
 static inline void Proj4B(const float* p, float v0, float v1, float v2, float len2,
                           float& mn, float& mx)
 {
@@ -87,24 +86,24 @@ static inline void Proj4B(const float* p, float v0, float v1, float v2, float le
         if (r < mn) mn = r;
     }
 }
-// ---- items of slice s0069b910 end
 
-// ---- items of slice s0069d090 begin (TODO(rewrite): local stubs, replace by canonical classes)
-extern "C" void* memcpy(void*, const void*, unsigned int);
-extern "C" void* copy_705250(const void*, const void*, void*);  // 0x00705250
+// Vector of 16-byte records; the erase helpers shift the tail down over a removed range.
 struct Quad16 { char b[16]; };
+
 struct VecF {
     void* mBegin;   // +0x00
     void* mEnd;     // +0x04
     void* mCap;     // +0x08
     void* pad0;     // +0x0c
     void* pad1;     // +0x10
+
     void erase() {
         void* first = mBegin;
         void* last  = mEnd;
         memcpy(first, last, (unsigned)((char*)mEnd - (char*)last));
         mEnd = (void*)((int*)mEnd - ((int*)last - (int*)first));
     }
+
     void eraseQ() {
         Quad16* first = (Quad16*)mBegin;
         Quad16* last  = (Quad16*)mEnd;
@@ -112,18 +111,19 @@ struct VecF {
         mEnd = (void*)((Quad16*)mEnd - (last - first));
     }
 };
+
 struct SpVector {
     void* mBegin; void* mEnd; void* mCap; void* pad0; void* pad1;
     void* erase(void* first, void* last);                 // 0x0050f740
     void eraseAll() { erase(mBegin, mEnd); }
 };
+
 struct ClrTriple {
     VecF v[3];      // +0x00, +0x14, +0x28
     void clr090();
     void clr100();
     void clr150();
 };
-// ---- items of slice s0069d090 end
 
 // @ 0x00692700
 double ReadDouble(const char* s)
@@ -140,8 +140,8 @@ bool cSerializerStatus::IsReady() const
 unsigned char cSerializerDispatcher::Dispatch(void* a, void* b)
 {
     if (mpCallback != 0 && mpGetContext != 0) {
-        void* ctx = ((void*(*)(void*))mpGetContext)(this);
-        return (unsigned char)((unsigned int(*)(void*,void*,void*))mpCallback)(a, b, ctx);
+        void* ctx = mpGetContext(this);
+        return (unsigned char)mpCallback(a, b, ctx);
     }
     return 0;
 }
@@ -163,24 +163,27 @@ bool cSerializerLazy::Resolve()
 // @ 0x00695c30
 extern "C" bool __fastcall FUN_00695c30(void* self)
 {
-    if (*(char*)((char*)self + 8) != 0)
+    enum { kActiveFlagOffset = 8, kOwnedObjectOffset = 0x4c };
+
+    if (*(char*)((char*)self + kActiveFlagOffset) != 0)
     {
-        void* p = *(void**)((char*)self + 0x4c);
+        void* p = *(void**)((char*)self + kOwnedObjectOffset);
         if (p != 0)
             ((void(__thiscall*)(void*, int))VFN(p, 0))(p, 1);
-        *(void**)((char*)self + 0x4c) = 0;
+        *(void**)((char*)self + kOwnedObjectOffset) = 0;
         FUN_0067e070(0);
         FUN_00883780();
     }
-    *(char*)((char*)self + 8) = 0;
+    *(char*)((char*)self + kActiveFlagOffset) = 0;
     return true;
 }
 
 // @ 0x00697960
 void* __fastcall ZeroLocalInputState(void* p)
 {
-  memset(p, 0, 0x48);
-  return p;
+    enum { kLocalInputStateSize = 0x48 };
+    memset(p, 0, kLocalInputStateSize);
+    return p;
 }
 
 // @ 0x0069b910
