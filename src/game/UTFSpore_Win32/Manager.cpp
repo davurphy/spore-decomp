@@ -24,6 +24,7 @@ extern "C" int FixedAllocatorAddCore(void* pThis, int a, int b); // 0x00926650
 #include "EA/Allocator/ICoreAllocator.h"
 #include "EA/Allocator/StackAllocator.h"
 #include <intrin.h>
+#include "EA/ResourceMan/Factory.h"
 #pragma intrinsic(_InterlockedIncrement, _InterlockedDecrement, _InterlockedExchange, _InterlockedExchangeAdd)
 
 // ---- items of slice s008de020 begin (TODO(rewrite): local stubs, replace by canonical classes)
@@ -703,6 +704,72 @@ struct HashTable {
     WString* KeyNameOperatorIndex(Key_s008e_0eb0* pKey);               // 0x008E0EB0 (hash_map::operator[])
 
     void** endIterator() { return mpBucketArray + mnBucketCount; }
+};
+}
+}
+namespace EA {
+namespace ResourceMan {
+class Factory_s008e_0eb0 { public:
+    virtual void Slot00();                                                     // +0x00
+    virtual void AddRef();                                                     // +0x04
+    virtual void Release();                                                    // +0x08
+    virtual int  Slot0C();                                                     // +0x0c
+    virtual void Slot10();                                                     // +0x10
+    virtual void Slot14();                                                     // +0x14
+    virtual void Slot18();
+    virtual void Slot1C(void* a, void* b, void* c, void* d);
+    virtual void Slot20();
+    virtual void Slot24();
+    virtual void Slot28();
+    virtual uint32 Slot2C(uint32* pOut, uint32 nCount);                        // +0x2c
+    virtual void Slot30(void* a, void* b);
+    virtual char Slot34(Key_s008e_0eb0* pKey, void* pTypeParam, int a, int b, int c, int d);
+    virtual void Slot38();
+    virtual void Slot3C();
+    virtual void Slot40();
+    virtual char Slot44(int a, void* b, int c);
+    virtual void Slot48();
+    virtual void Slot4C();
+    virtual void Slot50();
+    virtual char Slot54(void* a, int b);
+    virtual void* Slot58(Key_s008e_0eb0* pKey);
+};
+}
+}
+namespace EA {
+namespace ResourceMan {
+struct Compressor {
+    void** vftable;   // +0x00
+};
+}
+}
+namespace EA {
+namespace ResourceMan {
+class Manager_s008e_0eb0 { public:
+    void** vftable;                     // +0x00
+    uint8  mbInitialized;               // +0x04
+    char   _pad05[3];
+    void*  mpAllocator;                 // +0x08
+    uint8  _pad0c[0x20];                // +0x0c change-notification set
+    void*  mDatabaseListHead;           // +0x2c
+    HashTable mTypeToFactoriesMap;      // +0x30
+    HashTable mTypeFactoryMap;          // +0x54
+    HashTable mTypeToFactoryArrayMap;   // +0x78
+    HashTable mTypenameMap;             // +0x9c
+    uint8  _padC0[0x34];                // +0xc0
+    HashTable mKeyNameMap;              // +0xf4
+    Thread::Mutex_s008e_0eb0 mNameMutex;           // +0x118
+    uint8  _pad148[0x20];               // +0x148
+    Compressor* mpCompressorBegin;      // +0x168
+    Compressor* mpCompressorEnd;        // +0x16c
+
+    bool     SetKeyName(Key_s008e_0eb0* pKey, const wchar_t* pName);        // 0x008E1480
+    bool     ForgetKeyName(Key_s008e_0eb0* pKey);                           // 0x008E14E0
+    bool     SetTypename(uint32 nType, const wchar_t* pName);    // 0x008E1560
+    bool     ResetTypename(uint32 nType, const wchar_t* pName);  // 0x008E1610
+    int      Shutdown();                                         // 0x008E1700
+    void     Fn8e1930(uint32 nKey, uint32* pIds, uint32 nCount); // 0x008E1930
+    int      RegisterFactory(char bAdd, Factory_s008e_0eb0* pFactory);      // 0x008E1A50
 };
 }
 }
@@ -1674,6 +1741,20 @@ EA::ResourceMan::InternalDatabaseList_s008e_0eb0::~InternalDatabaseList_s008e_0e
             mpVecBegin, static_cast<uint32>(reinterpret_cast<uint8*>(mpVecCap) - reinterpret_cast<uint8*>(mpVecBegin)));
 
     Fn922130(&mMutex);
+}
+
+// @ 0x008e1480
+bool EA::ResourceMan::Manager_s008e_0eb0::SetKeyName(EA::ResourceMan::Key_s008e_0eb0* pKey, const wchar_t* pName)
+{
+    mNameMutex.Lock(reinterpret_cast<const char*>(0x1436AB8));
+    EA::ResourceMan::WString* pStr = mKeyNameMap.KeyNameOperatorIndex(pKey);
+    const char* pBegin = reinterpret_cast<const char*>(pName);
+    const char* pScan  = pBegin;
+    while (*reinterpret_cast<const wchar_t*>(pScan) != 0)
+        pScan += 2;
+    pStr->assign(pName, pBegin + ((pScan - pBegin) >> 1) * 2);
+    mNameMutex.Unlock();
+    return true;
 }
 
 // @ 0x008e1d50

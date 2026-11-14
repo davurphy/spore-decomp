@@ -5,7 +5,7 @@
 008e1200 ?clearRange@AutoRefVec_s008e_0eb0@ResourceMan@EA@@QAEXPAUAutoRefObj_s008e_0eb0@23@0@Z  # AutoRefVec_s008e_0eb0::clearRange migrated from s008e0eb0 (verbatim, slice spelling)
 008e12c0 ?insertAt@AutoRefVec@ResourceMan@EA@@QAEPAUAutoRefObj@23@PAU423@PBU423@@Z  # inferred: AutoRefVec::insertAt
 008e1420 ??1InternalDatabaseList_s008e_0eb0@ResourceMan@EA@@QAE@XZ  # InternalDatabaseList_s008e_0eb0::~InternalDatabaseList migrated from s008e0eb0 (verbatim, slice spelling)
-008e1480 ?SetKeyName@Manager@ResourceMan@EA@@QAE_NPAUKey@23@PB_W@Z  # PDB: Manager::SetKeyName
+008e1480 ?SetKeyName@Manager_s008e_0eb0@ResourceMan@EA@@QAE_NPAVKey_s008e_0eb0@23@PB_W@Z  # Manager_s008e_0eb0::SetKeyName migrated from s008e0eb0 (verbatim, slice spelling)
 008e14e0 ?ForgetKeyName@Manager@ResourceMan@EA@@QAE_NPAUKey@23@@Z  # PDB: Manager::ForgetKeyName
 008e1560 ?SetTypename@Manager@ResourceMan@EA@@QAE_NIPB_W@Z  # PDB: Manager::SetTypename
 008e1610 ?ResetTypename@Manager@ResourceMan@EA@@QAE_NIPB_W@Z  # PDB: Manager::ResetTypename
