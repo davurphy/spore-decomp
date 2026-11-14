@@ -72,8 +72,9 @@ def main():
             print(s, flush=True)
             open(logp, "a").write(s + "\n")
 
-    if git("status", "--porcelain", "--untracked-files=no")[1].strip():
-        sys.exit("main has uncommitted changes to tracked files: commit or stash them first")
+    # only the paths landings write: unrelated local edits (tools, docs) do not meet the workers' commits
+    if git("status", "--porcelain", "--untracked-files=no", "--", "src", "symbols", "match")[1].strip():
+        sys.exit("main has uncommitted changes under src/, symbols/ or match/: commit or stash them first")
     ents = json.load(open(os.path.join(ROOT, "work", "batches", a.batch + ".json")))
     mods, sids = [], {}
     for e in ents:
