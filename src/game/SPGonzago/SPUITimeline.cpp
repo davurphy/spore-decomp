@@ -3097,9 +3097,8 @@ bool cUITimedTooltip::UpdateE()
 
 // @ 0x00e36ed0
 int32_t __cdecl GetGameLevel(int32_t nGameMode)
-{
-    int32_t nMode = nGameMode;
-    if (nGameMode == -1)
+{    int32_t nMode = nGameMode;
+    if (nMode == -1)
         nMode = (int32_t)SP_GetCurrentGameMode();
     switch (nMode) {
     case 0x1654c00:
@@ -3115,9 +3114,8 @@ int32_t __cdecl GetGameLevel(int32_t nGameMode)
     case 0x1654c10:
         return 5;
     default:
-        return nGameMode;
-    }
-}
+        return *(volatile int32_t*)&nGameMode;
+    }}
 
 // @ 0x00e36f50
 uint32_t __cdecl GetGameModeIndex(uint32_t nHash)

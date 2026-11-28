@@ -525,16 +525,14 @@ extern "C" int* __cdecl Fd01210(int* first, int* last, int* value)
 
 // @ 0x00d01410
 RelData* RelBook::FindRel(RelTree* t, uint32_t a, uint32_t b)
-{
+{    RelData* r = 0;
     NormalizePair(&a, &b);
     uint32_t key[2] = { a, b };
-    RBNode* it;
-    t->find(&it, key);
-    RelData* r = 0;
+    t->find((RBNode**)&a, key);
+    RBNode* it = (RBNode*)a;
     if (it != &t->anchor)
         r = (RelData*)((char*)it + 0x18);
-    return r;
-}
+    return r;}
 
 extern char kVarListDescA[]; // 0x01582008
 

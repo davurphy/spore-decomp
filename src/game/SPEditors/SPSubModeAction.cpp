@@ -567,13 +567,12 @@ bool SP::cSPPlayModeSubModeAction::OnMouseMove(float x, float y, unsigned int fl
 
 // @ 0x00638790
 void SP::cSPPlayModeSubModeAction::UpdateBabyCelebrationTimes(unsigned int dtMs)
-{
-    SP::cSPPlayMode* pm = mPlayMode;
+{    SP::cSPPlayMode* pm = mPlayMode;
     int i = 0;
     uint32_t off = 0x40;
     do {
         if (*(float*)((char*)pm + off) > 0.0f) {
-            float* p = (float*)((char*)mPlayMode + off);
+            float* p = (float*)((char*)(*(SP::cSPPlayMode* volatile*)&mPlayMode) + off);
             *p -= (float)dtMs * 0.001f;
             if (*p <= 0.0f) {
                 pm->SetBabySpawned(i, false);
@@ -583,8 +582,7 @@ void SP::cSPPlayModeSubModeAction::UpdateBabyCelebrationTimes(unsigned int dtMs)
         }
         off += 4;
         i++;
-    } while (off < 0x4c);
-}
+    } while (off < 0x4c);}
 
 // @ 0x00638810
 bool SP::cSPPlayModeSubModeAction_s0063_7f80::ReachedMomTargetAngle(uint32_t dtMs)

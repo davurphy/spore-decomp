@@ -36,3 +36,4 @@
 ../src/game/SPGonzago/SPUITimeline.cpp  ?UpdateE@cUITimedTooltip@@QAE_NXZ  00e36e80  /O2 /Ob2 /MD /Gy /TP /arch:SSE /fp:fast /GS- /Isrc/game/include
 ../src/game/SPGonzago/SPUITimeline.cpp  ?UpdateD@cUITimedTooltip@@QAE_NXZ  00e36e20  /O2 /Ob2 /MD /Gy /TP /arch:SSE /fp:fast /GS- /Isrc/game/include
 ../src/game/SPGonzago/SPUITimeline.cpp  ?GetDrawPriority@cBigEditorObject@@QAEHXZ  00e3a230  /O2 /MD /Gy /TP /arch:SSE /fp:fast /GS- /Isrc/game/include
+../src/game/SPGonzago/SPUITimeline.cpp  ?GetGameLevel@@YAHH@Z  00e36ed0  /O2 /Ob2 /MD /Gy /TP /arch:SSE /fp:fast /GS- /Isrc/game/include

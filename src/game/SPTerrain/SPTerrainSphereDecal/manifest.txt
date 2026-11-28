@@ -1,1 +1,2 @@
 # source  symbol  va  flags
+../src/game/SPTerrain/SPTerrainSphereDecal.cpp  ?Destroy@DecalOwner@@QAEXXZ  00fad4f0  /O2 /MD /Gy /TP /GS- /arch:SSE /fp:fast /Isrc/game/include

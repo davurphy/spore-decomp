@@ -463,13 +463,23 @@ void SP::cCreatureView::FUN_00e8bca0(cCreature* p)
 
 // @ 0x00e8bd10
 SP::cCreatureView* __stdcall SP::FUN_00e8bd10(void* pSrc)
-{
+{    SP::cCreatureView* pView = 0;
     void* pArg = pSrc != 0 ? vcall1(pSrc, 0x0c, (void*)0xce9f6639) : 0;
-    SP::cCreatureView* pView =
-        new ("Simulator/cCreatureView", 0, 0, 0, 0) SP::cCreatureView;
+    SP::cCreatureView* pMem =
+        (SP::cCreatureView*)operator new(sizeof(SP::cCreatureView), "Simulator/cCreatureView", 0, 0, 0, 0);
+    if (pMem != 0) {
+        volatile SP::cCreatureView* pv = pMem;
+        pv->m08 = 0;
+        pv->m04 = 0;
+        pv->mpVtbl = g_vtbl_014863cc;
+        pv->mpCreature = 0;
+        pv->mpOverhead = 0;
+        pv->mb14 = 1;
+        pv->mp18 = 0;
+        pView = pMem;
+    }
     pView->FUN_00e8bca0((cCreature*)pArg);
-    return pView;
-}
+    return pView;}
 
 // @ 0x00e8bd70
 void SP::cCreatureView::FUN_00e8bd70(bool b)

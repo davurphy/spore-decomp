@@ -14,6 +14,7 @@ extern "C" long __cdecl _InterlockedExchangeAdd(volatile long*, long);
 #include "rw/graphics/VertexBuffer.h"
 #include "rw/graphics/VertexDescriptor.h"
 #include <string.h>
+#include <intrin.h>
 #pragma intrinsic(_InterlockedExchangeAdd)
 
 // ---- items of slice s00fac5c0 begin (TODO(rewrite): local stubs, replace by canonical classes)
@@ -364,21 +365,26 @@ void DecalNode_UpdateBasis(DecalNode* pNode)
 
 // @ 0x00fad4f0
 void DecalOwner::Destroy()
-{
-    mpVtbl = (void*)0x1491090;
-    if (mpRef_128 != 0) {
-        volatile long* pCount = (volatile long*)((char*)mpRef_128 + 8);
-        _InterlockedExchangeAdd(pCount, -1);
-        long n = _InterlockedExchangeAdd(pCount, 0);
-        if (n < 1)
-            _InterlockedExchangeAdd(pCount, 1);
+{    extern char g_1491090[];
+    extern char g_13ef094[];
+    struct RefObj {
+        void* vtbl;
+        void* f4;
+        volatile long count;
+    };
+    mpVtbl = (void*)g_1491090;
+    _ReadWriteBarrier();
+    RefObj* p = (RefObj*)mpRef_128;
+    if (p != 0) {
+        _InterlockedDecrement(&p->count);
+        if (_InterlockedExchangeAdd(&p->count, 0) < 1)
+            _InterlockedExchangeAdd(&p->count, 1);
         else
-            _InterlockedExchangeAdd(pCount, 0);
+            _InterlockedExchangeAdd(&p->count, 0);
     }
     if (mpBlock_80 != 0 && ((int*)mpBlock_80)[-1] != 0)
         FreeArr(mpBlock_80);
-    mpVtbl = (void*)0x13ef094;
-}
+    mpVtbl = (void*)g_13ef094;}
 
 // @ 0x00fad550
 bool cTerrainSphereDecal_s00fa_d550::DispatchStaticDecal(int index, int param3)

@@ -365,20 +365,19 @@ void* PosseSim::Dtor(unsigned int flags)
 
 // @ 0x00d53730
 void PosseSim::Shutdown()
-{
-    PosseSim* self = this;
-    ((void(__thiscall*)(void*))FUN_00b234c0)(SP_NounManager());
-    Slot** e = *(Slot***)((char*)self + 0x24);
-    while (e != self->mpBegin) {
-        e -= 1;
-        Slot* s = *e;
+{    ((void(__thiscall*)(void*))FUN_00b234c0)(SP_NounManager());
+    while (mpBegin != mpEnd) {
+        Slot* s = *(mpEnd - 1);
         if (s->occupant.mp) {
             s->occupant = (RefObj*)0;
         }
+        _ReadWriteBarrier();
+        if (s->occupant.mp) {
+            s->occupant.mp->Release();
+        }
         EA_Free(s);
-        *(Slot***)((char*)self + 0x24) = e;
-    }
-}
+        mpEnd -= 1;
+    }}
 
 // ---- items for PosseSim::OnTick (0x00d53790)
 struct PosseNoun;

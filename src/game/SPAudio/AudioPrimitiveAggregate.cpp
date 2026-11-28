@@ -20,6 +20,13 @@ typedef unsigned char  u8;
 typedef unsigned int   u32;
 struct SystemAT;                       // EA::Audio::System (huge vtable)
 SystemAT* GetSystemAT();               // 0x00a206f0
+struct IPrimitive;
+struct AggVec {
+    void** mpBegin;
+    void** mpEnd;
+    void** mpCapacity;
+    void   DoInsertValue(void** pos, IPrimitive* const& val); // 0x00899480
+};
 int       FUN_00899480(void*, void*);
 void*     FUN_006abeb0(u32 size);
 struct FixedAllocatorBase { bool AddCore(int, int); };   // 0x00926650
@@ -306,24 +313,24 @@ bool PAgg::UpdatePrimitives()
 
 // @ 0x00a16e20
 bool Agg::PushBack(IPrimitive* p)
-{
-    p->v00();
-    if (mpEnd < mpCapacity) {
-        void** slot = mpEnd;
-        mpEnd = slot + 1;
+{    IPrimitive* prim = *(IPrimitive* volatile*)&p;
+    prim->v00();
+    AggVec* vec = (AggVec*)&mpBegin;
+    if (vec->mpEnd < vec->mpCapacity) {
+        void** slot = vec->mpEnd;
+        vec->mpEnd = slot + 1;
         if (slot) {
-            *slot = p;
+            *slot = prim;
             --mModify;
             mbDirty = true;
             return true;
         }
     } else {
-        FUN_00899480(mpEnd, &p);
+        vec->DoInsertValue(vec->mpEnd, p);
     }
     --mModify;
     mbDirty = true;
-    return true;
-}
+    return true;}
 
 // @ 0x00a367a0
 namespace EA { namespace Audio {

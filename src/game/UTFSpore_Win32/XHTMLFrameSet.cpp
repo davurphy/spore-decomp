@@ -11,6 +11,7 @@ extern "C" char g_14467bc[];
 #include "game/types.h"
 #include "EA/UTFWinExtras/cXHTMLFrameSet.h"
 #include "EA/UTFWinExtras/WinXHTML.h"
+#include <intrin.h>
 
 // unnamed retail callees and globals (address in the comment)
 extern "C" long _InterlockedExchangeAdd(volatile long*, long);
@@ -522,12 +523,14 @@ __thiscall cXHTMLFrameSet_s0099_5b20::cXHTMLFrameSet_s0099_5b20(void* frameFacto
 
 // @ 0x00996d40
 uint32_t __thiscall cXHTMLFrameSet_s0099_5b20::GetFrame(const uint16_t* str)
-{
-    uint32_t hash = FNV1_String16(str, 0x811c9dc5, 0);
+{    uint32_t hash = FNV1_String16(str, 0x811c9dc5, 0);
     uint32_t* end = (uint32_t*)mField10;
     uint32_t key = hash;
     uint32_t* it = FUN_00d01260_s0099_5b20((uint32_t*)mField0c, end, &key, mField20);
-    if (it != end && !(key < *it) && it != it + 2)
+    if (it == end || hash < *it || it == it + 2)
+        it = end;
+    _ReadWriteBarrier();
+    if (it != end)
         return it[1];
     return 0;
 }

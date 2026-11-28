@@ -398,13 +398,22 @@ struct Elem34 {
 
 // @ 0x00f2a430
 void __cdecl CopyElem34Range(Elem34* dst, Elem34* dstEnd, const Elem34* src)
-{
-    if (dst != dstEnd)
+{    if (dst != dstEnd)
     {
+        const Vec20B* srcVec = &src->mVec;
+        uint32_t* p = &dst->m4;
         do
         {
-            *dst = *src;
+            dst->m0 = src->m0;
+            p[-3] = src->m1;
+            p[-2] = src->m2;
+            p[-1] = src->m3;
+            p[0] = src->m4;
+            p[1] = src->m5;
+            p[2] = src->m6;
+            *(Vec20B*)(p + 3) = *srcVec;
+            p[8] = src->m7;
             ++dst;
+            p += 0x34 / 4;
         } while (dst != dstEnd);
-    }
-}
+    }}

@@ -238,8 +238,9 @@ struct BC4900 { void Do(u32, u32, u32); };                  // 0x00bc4900
 struct C0E370 { s32  Do(); };                              // 0x00c0e370
 struct C0E0C0 { u8   Do(u32); };                           // 0x00c0e0c0
 struct NearGoal { u8  Do(); };                             // 0x00c42e20
-struct PlayAnim { u32  Do(u32, u32, u32); };               // 0x00c12190
-struct PlayAnim2 { u32 Do(u32, u32, u32); };               // 0x00c12190
+struct AnimId { u32 v; AnimId(u32 x) : v(x) {} };
+struct PlayAnim { u32  Do(u32, u32, u32); u32 Do(AnimId, u32, u32); };               // 0x00c12190
+struct PlayAnim2 { u32 Do(u32, u32, u32); u32 Do(AnimId, u32, u32); };               // 0x00c12190
 struct Interrupt { void Do(u32, u32, u32); };              // 0x00c12310
 struct MoveTo { void Do(u32, void*, f32, f32); };          // 0x00c1c1d0
 struct GetCity { void* Do(); };                            // 0x00c23e40
@@ -1719,24 +1720,27 @@ bool FUN_00d91650(void* p0, u32 a1, u32 a2, u32 a3, u32 a4, AnimState* st)
 
 // @ 0x00d916b0
 bool FUN_00d916b0(void* p0, u32 a1, u32 a2, u32 flags, u32 a4, u8* flag)
-{
-    Creature* c = (Creature*)p0;
+{    Creature* c = (Creature*)p0;
     if ((flags & 0x6000000) == 0)
         return false;
     if (((NearGoal*)&c->mC0)->Do() && *flag == 0) {
         *flag = 1;
-        double r = ((RandDbl*)0x1601760)->Do();
+        double r = ((RandDbl*)g_1601760)->Do();
         if ((flags | 0x2000000) != 0) {
-            (r < *(f32*)0x1471064)
-                ? ((PlayAnim*)c)->Do(0x62d64e3, 1, 0xffffffff)
-                : ((PlayAnim2*)c)->Do(0x62d64e4, 1, 0xffffffff);
+            if (r < SP::kFlHalf) {
+                _ReadWriteBarrier();
+                AnimId id(0x62d64e3);
+                ((PlayAnim*)c)->Do(id, 1, 0xffffffff);
+                return true;
+            }
+            AnimId id2(0x62d64e4);
+            ((PlayAnim2*)c)->Do(id2, 1, 0xffffffff);
             return true;
         }
-        u32 anim = (r < *(f32*)0x1471064) ? 0x2481dcb : 0x2481dcc;
+        u32 anim = (r < SP::kFlHalf) ? 0x2481dcb : 0x2481dcc;
         ((PlayAnim*)c)->Do(anim, 1, 0xffffffff);
     }
-    return true;
-}
+    return true;}
 
 // @ 0x00d91750
 f32 FUN_00d91750(void* p0)
