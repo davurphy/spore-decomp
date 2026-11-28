@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""No new gotos: fail a pull request that raises any function's `goto` count.
+"""No goto in anything a pull request writes: fail when a function it adds or changes still has a `goto`.
 
 usage: goto_check.py BASE_REF HEAD_REF
-       prints each function (by its `// @ 0x<address>` marker) or file preamble whose goto count rose; exit 1 if any.
+       prints each function (by its `// @ 0x<address>` marker) or file preamble that the pull request adds or changes
+       and that has a goto after it; exit 1 if any.
 
 Since 2026-11-28 `goto` is not accepted in the contribution paths (the maintainer's call: "the closest thing to a red
 line"). Existing gotos are being removed; until they are all gone this is a ratchet. Counts are per function, so
@@ -23,14 +24,15 @@ _MARKER = re.compile(r"^[ \t]*//[ \t]*@[ \t]*0x([0-9a-fA-F]{6,8})\b", re.M)
 
 
 def regions(text, path):
-    """{key: gotos}: each function by address (from its marker to the next), and the file's preamble."""
+    """{key: code}: each function by address (from its marker to the next) and the file's preamble, as code with
+    comments and strings removed and whitespace collapsed (so a reformatted comment is not a change)."""
     ms = list(_MARKER.finditer(text))
-    n = lambda t: len(GOTO.findall(_STRIP.sub(" ", t)))
-    out = {("preamble", path): n(text[:ms[0].start()] if ms else text)}
+    code = lambda t: " ".join(_STRIP.sub(" ", t).split())
+    out = {("preamble", path): code(text[:ms[0].start()] if ms else text)}
     for i, m in enumerate(ms):
         end = ms[i + 1].start() if i + 1 < len(ms) else len(text)
         k = ("function", int(m.group(1), 16))
-        out[k] = out.get(k, 0) + n(text[m.end():end])
+        out[k] = (out.get(k, "") + " " + code(text[m.end():end])).strip()
     return out
 
 
@@ -55,16 +57,18 @@ def compare(base, head):
             t = show(rev, p)
             if t is not None:
                 for k, v in regions(t, p).items():
-                    acc[k] = acc.get(k, 0) + v
-    rose = [(k, before.get(k, 0), v) for k, v in after.items() if v > before.get(k, 0)]
-    return rose, sum(before.values()), sum(after.values())
+                    acc[k] = (acc.get(k, "") + " " + v).strip()
+    n = lambda c: len(GOTO.findall(c))
+    bad = [(k, n(before.get(k, "")), n(v)) for k, v in after.items() if n(v) and v != before.get(k)]
+    return bad, sum(map(n, before.values())), sum(map(n, after.values()))
 
 
 def main():
     rose, b, a = compare(sys.argv[1], sys.argv[2])
     for (kind, k), was, now in sorted(rose, key=lambda r: str(r[0])):
         where = "0x%08x" % k if kind == "function" else "%s (outside any function)" % k
-        print("%s: %d goto%s, was %d" % (where, now, "" if now == 1 else "s", was))
+        print("%s: %s, with %d goto%s (%d before)" % (where, "added" if kind == "function" and was == 0 and now else "changed",
+                                                     now, "" if now == 1 else "s", was))
     print("gotos in the changed files: %d before, %d after" % (b, a), file=sys.stderr)
     return 1 if rose else 0
 
