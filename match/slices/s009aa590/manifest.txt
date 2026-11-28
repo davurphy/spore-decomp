@@ -17,3 +17,4 @@ slices/s009aa590/s009aa590.cpp  ?DoInsertValue@VecR@@QAEXPAPAXPBQAX@Z  009ab030
 slices/s009aa590/s009aa590.cpp  ?Erase2@TreeQ@@QAE?AUIter@@U2@@Z  009ab150
 slices/s009aa590/s009aa590.cpp  ?DoInsertValue@VecP@@QAEXPAPAURefC@@PBQAU2@@Z  009ab170
 slices/s009aa590/s009aa590.cpp  ?push_back@VecP@@QAEXPBQAURefC@@@Z  009ab3f0
+slices/s009aa590/s009aa590.cpp  ?RemoveEntry@Mgr@@QAEXPAUIter@@@Z  009ab4a0  /O2 /MD /Gy /EHsc /TP

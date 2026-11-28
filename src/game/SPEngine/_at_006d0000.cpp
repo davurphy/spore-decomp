@@ -1197,45 +1197,27 @@ void FUN_006de350(void) // @ 0x006de350
 
 // @ 0x006de4e0
 void FUN_006de4e0(int param_1, int param_2, int param_3, int param_4)
-{
-    if (param_3 <= param_2)
+{    for (int iVar2 = (param_3 - 1) >> 1; param_3 > param_2; iVar2 = (param_3 - 1) >> 1)
     {
-        *(int*)(param_1 + param_3 * 4) = param_4;
-        return;
-    }
-    int iVar2;
-    do
-    {
-        iVar2 = (param_3 + -1) >> 1;
         int iVar1 = *(int*)(param_1 + iVar2 * 4);
         if (*(uint32_t*)(iVar1 + 4) <= *(uint32_t*)(param_4 + 4))
             break;
         *(int*)(param_1 + param_3 * 4) = iVar1;
         param_3 = iVar2;
-    } while (param_2 < iVar2);
-    *(int*)(param_1 + param_3 * 4) = param_4;
-}
+    }
+    *(int*)(param_1 + param_3 * 4) = param_4;}
 
 // @ 0x006de530
 void FUN_006de530(int param_1, int param_2, int param_3, int param_4)
-{
-    if (param_3 <= param_2)
+{    for (int iVar2 = (param_3 - 1) >> 1; param_3 > param_2; iVar2 = (param_3 - 1) >> 1)
     {
-        *(int*)(param_1 + param_3 * 4) = param_4;
-        return;
-    }
-    int iVar2;
-    do
-    {
-        iVar2 = (param_3 + -1) >> 1;
         int iVar1 = *(int*)(param_1 + iVar2 * 4);
-        if (*(uint32_t*)(param_4 + 4) <= *(uint32_t*)(iVar1 + 4))
+        if (*(uint32_t*)(iVar1 + 4) >= *(uint32_t*)(param_4 + 4))
             break;
         *(int*)(param_1 + param_3 * 4) = iVar1;
         param_3 = iVar2;
-    } while (param_2 < iVar2);
-    *(int*)(param_1 + param_3 * 4) = param_4;
-}
+    }
+    *(int*)(param_1 + param_3 * 4) = param_4;}
 
 // @ 0x006de580
 void FUN_006de580(int param_1, int param_2, int param_3, uint32_t param_4, ...)

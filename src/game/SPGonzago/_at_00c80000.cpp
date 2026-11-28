@@ -1086,14 +1086,10 @@ int GameData::HasFlag()
 
 // @ 0x00c88810
 void SpatialModel::SetModelKey3(uint32_t* key)
-{
-    if (m90 == key[0] && m94 == key[1] && m98 == key[2])
+{    if (m90 == key[0] && m94 == key[1] && m98 == key[2])
         return;
-    m90 = key[0];
-    m94 = key[1];
-    m98 = key[2];
-    ((VObj8c*)this)->v8c(1);
-}
+    memcpy(&m90, key, 12);
+    ((VObj8c*)this)->v8c(1);}
 
 // @ 0x00c88870
 void SpatialPos::Fn()

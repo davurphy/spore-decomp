@@ -646,12 +646,11 @@ void ThreadObj::FUN_011548d0(void)
 // ---------------------------------------------------------------------------
 unsigned int rw::audio::core::Mixer::HandleBufferStatusUnavailable(int sampleBuffer, int system,
                                                                    int numSamples)
-{
-    float f = *(float*)(sampleBuffer + 0x28);
+{    float f = *(float*)(sampleBuffer + 0x28);
     if (f > *(float*)(sampleBuffer + 0x30))
         *(float*)(sampleBuffer + 0x30) = f;
 
-    if (!(*(float*)(sampleBuffer + 0x2c) < *(float*)(sampleBuffer + 0x30)))
+    if (*(float*)(sampleBuffer + 0x2c) >= *(float*)(sampleBuffer + 0x30))
     {
         *(uint8_t*)(sampleBuffer + 0x45) = 0;
         return 0;

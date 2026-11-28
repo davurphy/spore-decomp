@@ -912,23 +912,18 @@ RCObjN* SetGlobalProvider(RCObjN* p)
 
 // @ 0x008fe9a0
 SIter* SMap::find(SIter* out, const uint16_t* const* key)
-{
+{    struct IterTmp {
+        SNode* node;
+        SNode** slot;
+        IterTmp(SNode* n, SNode** s) : node(n), slot(s) {}
+    };
     uint32_t h = HashStr(*key);
     unsigned n = mBucketCount;
     unsigned idx = h % n;
     SNode** b = mBuckets;
-    SIter it;
     SNode* f = DoFindNode(b[idx], key, h);
-    if (f) {
-        it.node = f;
-        it.slot = &b[idx];
-    } else {
-        it.node = b[n];
-        it.slot = &b[n];
-    }
-    *out = it;
-    return out;
-}
+    *(IterTmp*)out = f ? IterTmp(f, &b[idx]) : IterTmp(b[n], &b[n]);
+    return out;}
 
 // @ 0x008fea30
 HNode* __stdcall AllocHNode(SrcNode* s)

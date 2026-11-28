@@ -2,7 +2,6 @@
 008fe610 52 intrusive_hashtable DoInsertValue: original keeps &key in ebp and reloads node from the arg slot; ours keeps node in ebp flags: /O2 /MD /Gy /TP /GS- /arch:SSE2
 008fe830 16 ResourceCache ctor: store order/register use differs (edi=this+0x14 inline memset arg) flags: /O2 /MD /Gy /TP /GS- /arch:SSE2
 008fe930 54 global provider assign: refcount inc/dec addressed-mode fold differs (no separate load) flags: /O2 /MD /Gy /TP /GS- /arch:SSE2
-008fe9a0 64 string hashtable find: behaviour fixed - the original leaves eax = the out slot at the ret (equiv void_hides_eax), so the function now returns out on its single exit; remaining diff is codegen of the hash loop/iterator copy (uses ebx/ebp/esi/edi, size 128 vs 136, original materialises the SIter on the stack and copies it with mov edx/ecx) [equiv PASS 320 valid, 100% cov] flags: /O2 /MD /Gy /TP /GS- /arch:SSE2
 008feae0 137 ResourceCache::Clear: complete; list pop and release order scheduling differ flags: /O2 /MD /Gy /TP /GS- /arch:SSE2
 008feba0 18 ResourceCache::Find: complete; edi (node) reloaded after inlined splice stores flags: /O2 /MD /Gy /TP /GS- /arch:SSE2
 008fec20 277 ResourceCache::Insert: complete; original keeps the bool result in a reused param slot flags: /O2 /MD /Gy /TP /GS- /arch:SSE2

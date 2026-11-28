@@ -1121,22 +1121,34 @@ void __fastcall FUN_00817b00raw(cSPUIMovieRecordUI* p)
 
 // @ 0x00817c40
 bool CellNameSrc::getName(const wchar_t* key, EString* out)
-{
-    u32 h = FNV1_String16(key, 0x811c9dc5, 1);
-    EString* m;
-    if (h > 0xb148e703) {
-        if (h != 0xce645bea) return false;
-        m = f34;
-    } else {
-        if (h == 0xb148e703) m = f30;
-        else if (h == 0x6933bb85) m = f38;
-        else if (h != 0xae892933) return false;
-        else m = f3c;
-    }
-    if (!m) return false;
-    *out = *m;
-    return true;
-}
+{    switch (FNV1_String16(key, 0x811c9dc5, 1)) {
+    case 0x6933bb85:
+        if (f38) {
+            *out = *f38;
+            return true;
+        }
+        return false;
+    case 0xae892933:
+        if (f3c) {
+            *out = *f3c;
+            return true;
+        }
+        return false;
+    case 0xb148e703:
+        if (f30) {
+            *out = *f30;
+            return true;
+        }
+        return false;
+    case 0xce645bea:
+        if (f34) {
+            *out = *f34;
+            return true;
+        }
+        return false;
+    default:
+        return false;
+    }}
 
 // @ 0x00817cb0
 void PieMenuTimeText::UpdateTimeText()

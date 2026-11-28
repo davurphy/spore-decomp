@@ -113,10 +113,13 @@ void __cdecl FUN_01160300(float* dst, float* src, float start, float delta, int 
 // @ 0x011604d0
 // ---------------------------------------------------------------------------
 void BiquadObj::FUN_011604d0(float* coeffs, int n)
-{
+{    int i = 0;
     int cnt = n / 2 + 1;
-    for (int i = 0; i < cnt; i++)
-        coeffs[i] = (0.54f - cosf((float)i * 6.2831855f / (float)n) * 0.46f) * coeffs[i];
+    for (; i < cnt; i++)
+    {
+        *coeffs = (0.54f - cosf((float)i * 6.2831855f / (float)n) * 0.46f) * *coeffs;
+        coeffs++;
+    }
 }
 
 // ---------------------------------------------------------------------------

@@ -10,3 +10,4 @@ slices/s008cd6f0/s008cd6f0.cpp  ?New_maxpClass@@YAPAUmaxpClass@@PAUtsiMemObject@
 slices/s008cd6f0/s008cd6f0.cpp  ?New_locaClass@@YAPAUlocaClass@@PAUtsiMemObject@@PAUInputStream@@FH@Z  008cdd60  /O2 /MD /Gy /EHsc /TP /GS- /arch:SSE /fp:fast
 slices/s008cd6f0/s008cd6f0.cpp  ?New_hmtxClass@@YAPAUhmtxClass@@PAUtsiMemObject@@PAUInputStream@@HH@Z  008cda70  /O2 /MD /Gy /EHsc /TP /GS- /arch:SSE /fp:fast
 slices/s008cd6f0/s008cd6f0.cpp  ?FF_New_slocClass@@YAPAUslocClass@@PAUtsiMemObject@@PAUInputStream@@@Z  008cde20  /O2 /MD /Gy /EHsc /TP /GS- /arch:SSE /fp:fast
+slices/s008cd6f0/s008cd6f0.cpp  ?New_sfnt_OffsetTable@@YAPAUsfnt_OffsetTable@@PAUtsiMemObject@@PAUInputStream@@@Z  008cd860  /O2 /MD /Gy /EHsc /TP /GS- /arch:SSE /fp:fast

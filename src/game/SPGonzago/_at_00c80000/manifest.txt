@@ -21,3 +21,4 @@
 ../src/game/SPGonzago/_at_00c80000.cpp  ?sub_b210@cSpatialObjectView@@QAEXPAX@Z  00c8b210  /O2 /MD /Gy /EHsc /TP /arch:SSE /Isrc/game/include
 ../src/game/SPGonzago/_at_00c80000.cpp  ?FUN_00c8c9d0@@YAXPAVcPlanet@@@Z  00c8c9d0  /O2 /MD /Gy /TP /arch:SSE /fp:fast /Isrc/game/include
 ../src/game/SPGonzago/_at_00c80000.cpp  ?FUN_00c8d000@@YAXPAVcPlanet@@H@Z  00c8d000  /O2 /MD /Gy /TP /arch:SSE /fp:fast /Isrc/game/include
+../src/game/SPGonzago/_at_00c80000.cpp  ?SetModelKey3@SpatialModel@@QAEXPAI@Z  00c88810  /O2 /MD /Gy /EHsc /TP /arch:SSE /fp:fast /Isrc/game/include

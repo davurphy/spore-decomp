@@ -150,18 +150,18 @@ void CmdQueue::CancelCommand()
 
 // @ 0x00a0f9a0
 bool CmdQueue::ReadNext()
-{
-    if (mReadIndex >= mNumCmds)
+{    if (mReadIndex >= mNumCmds)
         return false;
+    EA::Audio::Command_s00a0_f350* pCmd = &mCmd;
     u32* p = (u32*)mRead;
-    mCmd.mCommandStart = (u8*)p;
-    mCmd.mCommandId = *p++;
-    mCmd.mCommandSize = *p++;
-    mCmd.mNumParameters = *p++;
-    mCmd.mCommandPtr = (u8*)p;
-    mCmd.mCommandEnd = mCmd.mCommandPtr + mCmd.mCommandSize;
+    pCmd->mCommandStart = (u8*)p;
+    pCmd->mCommandId = *p++;
+    pCmd->mCommandSize = *p++;
+    pCmd->mNumParameters = *p++;
+    pCmd->mCommandPtr = (u8*)p;
+    pCmd->mCommandEnd = pCmd->mCommandPtr + pCmd->mCommandSize;
+    mRead = (u32)pCmd->mCommandEnd;
     mReadIndex++;
-    mRead = (u32)mCmd.mCommandEnd;
     return mReadIndex <= mNumCmds;
 }
 

@@ -1057,15 +1057,21 @@ void cCommandParameterSet::AdjustParameterCount(u32 n)
 
 // @ 0x0068a870
 void cCommandParameterSet::RemoveParameter(u32 id)
-{
-    VIter it = mParameterMap.find(id);
-    VMapNode* node = it.mpNode;
-    if (node != mParameterMap.endNode()) {
-        mParameterMap.mnSize -= 1;
+{    struct Iter {
+        VMapNode* mpNode;
+        Iter(VMapNode* p) : mpNode(p) {}
+        bool operator!=(const Iter& o) const { return mpNode != o.mpNode; }
+    };
+    VMap* map = &mParameterMap;
+    VIter it = map->find(id);
+    if (*(Iter*)&it != Iter(mParameterMap.endNode())) {
+        VMapNode* node = it.mpNode;
+        map->mnSize -= 1;
         RBTreeIncrement(node);
-        RBTreeErase(node, &mParameterMap.aRight);
-        if (node->mValue.mFlags & 4)
-            node->mValue.Destruct(0);
+        RBTreeErase(node, &map->aRight);
+        Variant* pv = &node->mValue;
+        if (pv->mFlags & 4)
+            pv->Destruct(0);
         EASTL_dealloc(node);
     }
 }

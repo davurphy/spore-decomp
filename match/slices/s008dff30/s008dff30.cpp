@@ -642,33 +642,29 @@ HashInsert18Result HashTable::insertNode1c(void* pKey, void* p3)
 // @ 0x008E0630
 // ===========================================================================
 int HashTable::eraseKey(uint32* pKey)
-{
-    int nBefore = mnElementCount;
-    uint32 idx = *pKey % mnBucketCount;
-    char* pSlot = (char*)mpBucketArray + idx * 4;
-    if (*(uint32*)pSlot != 0) {
-        uint32 node;
-        do {
-            node = *(uint32*)pSlot;
-            if (*pKey == *(uint32*)node) break;
-            pSlot = (char*)node + 0x18;
-        } while (*(uint32*)pSlot != 0);
-        while (*(uint32*)pSlot != 0) {
-            node = *(uint32*)pSlot;
-            if (*pKey != *(uint32*)node) break;
-            *(uint32*)pSlot = *(uint32*)(node + 0x18);
-            uint32* pBegin = *(uint32**)(node + 4);
-            if (pBegin) {
-                Alloc* pAlloc = *(Alloc**)(node + 0x10);
-                uint32 nBytes = ((*(uint32**)(node + 0xc) - pBegin) >> 2) * 4;
-                pAlloc->Free(pBegin, nBytes);
-            }
-            mpAllocator->Free((void*)node, 0x1c);
-            --mnElementCount;
-        }
+{    int nBefore = mnElementCount;
+    uint32 nKey = *pKey;
+    uint32 idx = nKey % mnBucketCount;
+    void** pSlot = &mpBucketArray[idx];
+    while (*pSlot != 0) {
+        uint32* node = (uint32*)*pSlot;
+        if (nKey == *node) break;
+        pSlot = (void**)(node + 6);
     }
-    return nBefore - mnElementCount;
-}
+    while (*pSlot != 0) {
+        uint32* node = (uint32*)*pSlot;
+        if (*pKey != *node) break;
+        *pSlot = (void*)node[6];
+        uint32* pBegin = (uint32*)node[1];
+        if (pBegin) {
+            Alloc* pAlloc = (Alloc*)node[4];
+            uint32 nBytes = ((uint32*)node[3] - pBegin) * 4;
+            pAlloc->Free(pBegin, nBytes);
+        }
+        mpAllocator->Free((void*)node, 0x1c);
+        --mnElementCount;
+    }
+    return nBefore - mnElementCount;}
 
 // ===========================================================================
 // @ 0x008E06D0

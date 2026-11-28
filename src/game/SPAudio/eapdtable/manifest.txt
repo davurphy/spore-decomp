@@ -7,3 +7,4 @@
 ../src/game/SPAudio/eapdtable.cpp  ?fx_alloc_sound@@YAPAXII@Z  00a62b60  /O2 /MD /Gy /EHsc /TP /GS- /arch:SSE /fp:fast /Isrc/game/include
 ../src/game/SPAudio/eapdtable.cpp  ?fx_meta_particles_cb@@YAXPAXIPBDIIM@Z  00a62c50  /O2 /MD /Gy /EHsc /TP /GS- /arch:SSE /fp:fast /Isrc/game/include
 ../src/game/SPAudio/eapdtable.cpp  ?fx_register_all@@YA_NXZ  00a62e90  /O2 /MD /Gy /EHsc /TP /Isrc/game/include
+../src/game/SPAudio/eapdtable.cpp  ?fx_register_metaparticles@@YA_NXZ  00a62a50  /O2 /MD /Gy /EHsc /TP /GS- /arch:SSE /fp:fast /Isrc/game/include

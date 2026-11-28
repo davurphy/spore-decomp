@@ -15,3 +15,4 @@
 ../src/game/SPAudio/AudioCommandQueue.cpp  ?SetUint64@Command_s00a0_f350@Audio@EA@@QAE_NHI@Z  00a0fcf0  /O2 /MD /Gy /EHsc /TP /arch:SSE /fp:fast /GS- /Isrc/game/include
 ../src/game/SPAudio/AudioCommandQueue.cpp  ?SetFloat@Command_s00a0_f350@Audio@EA@@QAE_NHM@Z  00a0fd30  /O2 /MD /Gy /EHsc /TP /arch:SSE /fp:fast /GS- /Isrc/game/include
 ../src/game/SPAudio/AudioCommandQueue.cpp  ?DeleteParameter@Command@Audio@EA@@QAEXI@Z  00a0fd70  /O2 /MD /Gy /EHsc /TP /arch:SSE /fp:fast /GS- /Isrc/game/include
+../src/game/SPAudio/AudioCommandQueue.cpp  ?ReadNext@CmdQueue@@QAE_NXZ  00a0f9a0  /O2 /MD /Gy /EHsc /TP /arch:SSE /fp:fast /GS- /Isrc/game/include

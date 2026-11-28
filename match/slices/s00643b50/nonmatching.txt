@@ -5,7 +5,6 @@
 00643f70 2 Hub::Request(Entry*, flag): complete; only the shared-epilogue choice differs: retail jne/je target the first of two byte-identical epilogues (+0xab/+0xac), ours the second (+0xbb/+0xbc). Tried an explicit else, adding a return after push_back, and an extra return; all keep the later epilogue. No other byte differs.
 00644040 576 Hub::Update(vector<Key3>*): complete; large EASTL list/vector inline code, scheduling and register choice differ
 006442e0 421 Hub::Want(Key3*): complete; same list/vector erase inlines, regalloc differs
-00644550 62 Hub::Load(vec*, flag): complete; this/vec/counter register assignment differs (ebp/edi/ebx/esi order)
 006445c0 425 Hub::Load2(vector<Key3>*): complete; temp vector building and loop regalloc differ
 006447c0 170 MakeLaunchData(flag, out): complete; constant-vs-register byte stores and store order differ [equiv REFUTED 2026-11-13 (angr, exact call pairing): the source computes something else, fix the logic before codegen levers; differs in call#2 target]
 00644990 9 Hub::Fn990 (dialog key select): complete; only store scheduling of the Key3 copy around the pushes differs

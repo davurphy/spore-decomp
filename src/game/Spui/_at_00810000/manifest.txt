@@ -25,3 +25,4 @@
 ../src/game/Spui/_at_00810000.cpp  ?dtor816910@MatEffect@@QAEXXZ  00816910  /O2 /MD /Gy /EHsc /TP /arch:SSE /Isrc/game/include
 ../src/game/Spui/_at_00810000.cpp  ?reload@cSPUIMovieRecordUI@@QAEXH@Z  008178b0  /O2 /MD /Gy /EHsc /TP /arch:SSE /Isrc/game/include
 ../src/game/Spui/_at_00810000.cpp  ?sub8167d0@MatEffect@@QAEXPAUIObj@@M@Z  008167d0  /O2 /MD /Gy /EHsc /TP /arch:SSE /Isrc/game/include
+../src/game/Spui/_at_00810000.cpp  ?getName@CellNameSrc@@QAE_NPB_WPAUEString@@@Z  00817c40  /O2 /MD /Gy /EHsc /TP /arch:SSE /Isrc/game/include

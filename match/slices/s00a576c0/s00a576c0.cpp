@@ -297,20 +297,22 @@ void CollTable::FreeChains(unsigned count)
 
 // @ 0x00a579d0
 CollNode* CollTable::Find(CollNode* head, CollNode* key, unsigned h)
-{
-    (void)h;
-    if (head) {
-        do {
-            if (key->type == head->type) {
-                if (key->type == 1) {
-                    if (*(float*)&key->value == *(float*)&head->value)
-                        return head;
-                } else if (key->type == 2 && key->value == head->value) {
-                    return head;
-                }
+{    (void)h;
+    while (head) {
+        if (key->type == head->type) {
+            bool match = false;
+            switch (key->type) {
+            case 1:
+                match = (*(float*)&key->value == *(float*)&head->value);
+                break;
+            case 2:
+                match = (key->value == head->value);
+                break;
             }
-            head = head->next;
-        } while (head);
+            if (match)
+                return head;
+        }
+        head = head->next;
     }
     return 0;
 }

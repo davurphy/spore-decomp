@@ -8,7 +8,6 @@
 00720920 492 MinMaxIndices: complete; original is 4x unrolled with min+max fused, ours is a simple loop
 00720b60 97 HashTable::Grow: complete; allocation/placement-new sequence and loop shape differ
 00720c90 89 UninitCopyFace28: complete; original skips mArea in the copy, register allocation differs
-00720d10 69 FillFace28: complete; register allocation differs
 00720d70 64 UninitCopyDual18: complete; aggregate copy uses edi temp vs original edx
 00720dd0 98 MoveCopy34: complete; mixed fld/int copy register allocation differs
 00720ea0 82 CopyFace28: complete; loop register allocation differs

@@ -610,22 +610,34 @@ Mgr::Mgr()
 
 // @ 0x009AB4A0
 void Mgr::RemoveEntry(Iter* pit)
-{
-    NodeP* n = (NodeP*)pit->n;
-    if (n->v.second.p) {
-        n->v.second.p->Fn(0);
+{    struct Local {
+        static inline void ClearC(RefC*& rp) {
+            RefC* old = rp;
+            if (old) {
+                rp = 0;
+                old->Release();
+            }
+        }
+        static inline void ClearD(RefD*& rp) {
+            RefD* old = rp;
+            if (old) {
+                rp = 0;
+                old->Release();
+            }
+        }
+    };
+    if (((NodeP*)pit->n)->v.second.p) {
+        ((NodeP*)pit->n)->v.second.p->Fn(0);
         if (g_vecP) g_vecP->push_back(&((NodeP*)pit->n)->v.second.p);
-        n = (NodeP*)pit->n;
-        RefC* c = n->v.second.p;
-        if (c) { n->v.second.p = 0; c->Release(); }
+        Local::ClearC(((NodeP*)pit->n)->v.second.p);
     }
-    n = (NodeP*)pit->n;
-    if (n->v.second.q && n->v.second.q->z)
-        total -= n->v.second.q->z->size;
-    n = (NodeP*)pit->n;
-    RefD* d = n->v.second.q;
-    if (d) { n->v.second.q = 0; d->Release(); }
-}
+    RefD* q = ((NodeP*)pit->n)->v.second.q;
+    if (q) {
+        Z* z = q->z;
+        if (z)
+            total -= z->size;
+    }
+    Local::ClearD(((NodeP*)pit->n)->v.second.q);}
 
 // @ 0x009AB540
 int Mgr::RemoveAll(int key, int max)

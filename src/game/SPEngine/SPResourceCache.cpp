@@ -569,9 +569,8 @@ __int64 C_6afc40::f(int node, __int64 expected)
 
 // @ 0x006afcb0
 void __fastcall FUN_006afcb0(__int64* self)
-{
-    while ((int)FUN_0068c140(self) != 0) {
-        __int64 h = *self;
+{    while ((int)FUN_0068c140(self) != 0) {
+        __declspec(align(8)) __int64 h = *self;
         char* p = (char*)(int)FUN_0068c140(&h);
         *(int*)self = *(int*)(p + 0x18);
         *(int*)((char*)self + 4) = *(int*)(p + 0x1c);

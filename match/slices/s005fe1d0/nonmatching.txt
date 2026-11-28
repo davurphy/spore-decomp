@@ -1,1 +1,0 @@
-005fe1d0  63  cSPUIIDCollector::Shutdown: complete; atomic refcount sequence uses one pointer register (original copies the address before each lock xadd)

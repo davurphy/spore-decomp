@@ -404,6 +404,7 @@ public:
 class cTerraformingInfo {
 public:
     Key* FUN_00bbc510();                         // 0x00bbc510
+    Key* FUN_00bbc510(Key* pOut);                // 0x00bbc510
 };
 class cPropertyObject {
 public:
@@ -469,6 +470,7 @@ extern Vector3 gDefaultTrailOffset;              // 0x016c6350
 cPlanet* __cdecl SP_GetActivePlanet();           // 0x01021260
 cSPMissionManager_s00e9_8bd0* __cdecl SP_GetMissionManager(); // 0x00feb9f0
 cTerraformingInfo* __stdcall SP_TerraformingManager(Key* pOut);  // 0x00b3d430
+cTerraformingInfo* __cdecl SP_TerraformingManager();             // 0x00b3d430
 int32_t __cdecl SP_GetUniverseContext();         // 0x01021080
 cGonzagoWorld* __cdecl SP_GonzagoModelWorld();   // 0x00b3d520
 cAudioSystem* __cdecl EA_Audio_GetSystemAT();    // 0x00a206f0
@@ -2306,10 +2308,8 @@ bool FUN_00e98c80(void* pArg1, void* pArg2)
 
 // @ 0x00e98d30
 bool FUN_00e98d30(cNounHolder* pNoun)
-{
-    Key info;
-    Key* pInfo = &info;
-    Key* pKey = SP_TerraformingManager(pInfo)->FUN_00bbc510();
+{    Key info;
+    Key* pKey = SP_TerraformingManager()->FUN_00bbc510(&info);
     const Key& key = pNoun->m_pUFOKeys->m_key;
     if (key.m_nGroup == pKey->m_nGroup && key.m_nType == pKey->m_nType
         && key.m_nInstance == pKey->m_nInstance) {
@@ -2321,8 +2321,7 @@ bool FUN_00e98d30(cNounHolder* pNoun)
             pCur++;
         }
     }
-    return false;
-}
+    return false;}
 
 // @ 0x00e98db0
 void cSPUFOGfx::SetVisible(bool bVisible)

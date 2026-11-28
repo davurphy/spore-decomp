@@ -1,6 +1,5 @@
 # va  diff-bytes  reason
 0092fcd0 251 complete; EA::IO::FilePath::SafeReplace string splice; EASTL insert helper approximated
-0092fe00 64 complete; EnsureTrailingPathSeparator; cl puts path in ecx where the original kept edx (char in cx)
 0092fe60 90 complete; ConcatenatePathComponents; separator char must be an int (32-bit cmp) and start-save reg differs
 00930180 212 complete: lengths/copies correct, register allocation differs
 009302b0 439 complete: directory-component splitter reproduced, schedule differs

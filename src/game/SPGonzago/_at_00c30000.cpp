@@ -6,6 +6,13 @@
 extern "C" void FUN_013c3880();
 extern "C" char g_1466c14[];
 extern "C" char g_146c56c[];
+extern "C" char g_146c6ec[];
+extern "C" char g_146c774[];
+extern "C" char g_146c790[];
+extern "C" char g_146c7f8[];
+extern "C" char g_146c820[];
+extern "C" char g_146c8e4[];
+extern "C" char g_146c8f0[];
 extern "C" char g_1573a60[];
 extern "C" char g_157a1f8[];
 
@@ -1930,16 +1937,12 @@ int cHitSphere::GetDelegateLowerBound()
 
 // @ 0x00c3f6f0
 cSolarHitSphere::cSolarHitSphere()
-{
-    mModelKey.typeID = 0;
-    mModelKey.instanceID = 0;
-    CHitSphereVtbls* pVtbls = (CHitSphereVtbls*)this;
-    pVtbls->mpVtbl00 = (void*)0x146c8f0;
-    pVtbls->mpVtbl04 = (void*)0x146c6ec;
-    pVtbls->mpVtbl34 = (void*)0x146c8e4;
-    pVtbls->mpVtbl70 = (void*)0x146c820;
-    pVtbls->mpVtbl144 = (void*)0x146c7f8;
-    pVtbls->mpVtbl148 = (void*)0x146c790;
-    pVtbls->mpVtbl210 = (void*)0x146c774;
-    mModelKey.groupID = 0;
-}
+{    CHitSphereVtbls* pVtbls = (CHitSphereVtbls*)this;
+    pVtbls->mpVtbl00 = (void*)g_146c8f0;
+    pVtbls->mpVtbl04 = (void*)g_146c6ec;
+    pVtbls->mpVtbl34 = (void*)g_146c8e4;
+    pVtbls->mpVtbl70 = (void*)g_146c820;
+    pVtbls->mpVtbl144 = (void*)g_146c7f8;
+    pVtbls->mpVtbl148 = (void*)g_146c790;
+    pVtbls->mpVtbl210 = (void*)g_146c774;
+    *(EA::ResourceMan::Key*)&mModelKey = EA::ResourceMan::Key();}

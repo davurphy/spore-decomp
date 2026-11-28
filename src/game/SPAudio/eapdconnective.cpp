@@ -1272,15 +1272,16 @@ void* pdfloat_new2(float f)
 
 // @ 0x00a59b50
 void FUN_00a59b50(PdObject* o, float v)
-{
-    o->mAt28 = *(uint32_t*)&v;
-    if (g_gOutletCount + 1 >= 1000)
-        return;
-    ++g_gOutletCount;
-    for (void* p = *(void**)((char*)o->pOb + 8); p != 0; p = *(void**)p)
-        EA::Audio::Eapd::outlet_float(*(void**)((char*)p + 4), v);
-    --g_gOutletCount;
-}
+{    *(float*)((char*)o + 0x28) = v;
+    struct OutletNode { OutletNode* next; void* target; };
+    struct OutletList { void* pad[2]; OutletNode* head; };
+    OutletList* out = (OutletList*)o->pOb;
+    if (++g_gOutletCount < 1000)
+    {
+        for (OutletNode* p = out->head; p != 0; p = p->next)
+            EA::Audio::Eapd::outlet_float(p->target, v);
+    }
+    --g_gOutletCount;}
 
 // @ 0x00a59bb0
 namespace EA {
@@ -1591,8 +1592,7 @@ void sel1_symbol(PdObject* o, int sym, void* b)
 
 // @ 0x00a5a330
 void sel2_float(PdObject* o, float v)
-{
-    if (*(int*)((char*)o + 0x28) == 1)
+{    if (*(int*)((char*)o + 0x28) == 1)
     {
         int n = *(int*)((char*)o + 0x2c);
         SelectElement* e = *(SelectElement**)((char*)o + 0x30);
@@ -1607,15 +1607,15 @@ void sel2_float(PdObject* o, float v)
             ++e;
         }
     }
-    int c = g_gOutletCount + 1;
-    g_gOutletCount = c;
-    if (c < 1000)
+    struct OutletNode { OutletNode* next; void* target; };
+    struct OutletList { void* pad[2]; OutletNode* head; };
+    OutletList* out = *(OutletList**)((char*)o + 0x34);
+    if (++g_gOutletCount < 1000)
     {
-        for (void* p = *(void**)((char*)*(void**)((char*)o + 0x34) + 8); p != 0; p = *(void**)p)
-            EA::Audio::Eapd::outlet_float(*(void**)((char*)p + 4), v);
+        for (OutletNode* p = out->head; p != 0; p = p->next)
+            EA::Audio::Eapd::outlet_float(p->target, v);
     }
-    --g_gOutletCount;
-}
+    --g_gOutletCount;}
 
 // @ 0x00a5a3c0
 void sel2_symbol(PdObject* o, int sym, void* b)

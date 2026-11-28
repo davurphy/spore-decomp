@@ -5,3 +5,5 @@ slices/s00b0c190/s00b0c190.cpp  ?ContainsId@cObjectIdSet@@QBE_NI@Z  00b0ce80  /O
 slices/s00b0c190/s00b0c190.cpp  ?DestroySlots@@YGXPAUcKeySlot@@0@Z  00b0cfd0  /O2 /MD /Gy /EHsc /TP /arch:SSE2 /fp:fast
 slices/s00b0c190/s00b0c190.cpp  ?CopySlotObjects@@YAXPAPAVcSlotObject@@IPBQAV1@@Z  00b0ce40  /O2 /MD /Gy /EHsc /TP /arch:SSE2 /fp:fast
 slices/s00b0c190/s00b0c190.cpp  ?CountSlots@@YAHPAUcKeySlot@@0@Z  00b0d010  /O2 /MD /Gy /EHsc /TP /arch:SSE2 /fp:fast
+slices/s00b0c190/s00b0c190.cpp  ?FindSlotRun@@YA?AUcKeySlotIter@@U1@0PBQAVcSlotObject@@@Z  00b0cf80  /O2 /MD /Gy /EHsc /TP /arch:SSE2 /fp:fast
+slices/s00b0c190/s00b0c190.cpp  ?Save@cPlanetDataBlockSaver@@QAE_NPAVIObjectPipe@@@Z  00b0d250  /O2 /MD /Gy /EHsc /TP /arch:SSE2 /fp:fast

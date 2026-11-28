@@ -1,7 +1,6 @@
 00a57750 201 CollPool::Init(count): free old buffer + prime grow + FixedPool::Init branch; structure/regalloc differ (compiled 200 vs original 232). flags /O2 /MD /Gy /EHsc /TP; difftest UNSUPPORTED (0/400 valid, fake-arity/write faults)
 00a57840 48 SpliceNodes(a,b,c,d): ring relink with A=d->prev/B=A->next/C=c->prev; branch/regalloc differ. flags /O2 /MD /Gy /EHsc /TP; difftest PASS (392 valid, 100% coverage)
 00a57900 161 CollTable::FreeChains(count): rehash bucket-array rebuild using CollTable::NewBuckets (thiscall) + free-list rehash loop; loop/regalloc differ. flags /O2 /MD /Gy /EHsc /TP; difftest WEAK (42 valid, 54.5% coverage)
-00a579d0 63 Find(head,key,h): walks bucket chain comparing type@8 then float/int@0xc; register allocation and branch layout differ. flags /O2 /MD /Gy /EHsc /TP /arch:SSE; difftest PASS (369 valid, 75% coverage)
 00a57a20 117 Lookup(out,key): hash+finds bucket, returns found node or end-sentinel bucket; store scheduling differs. flags /O2 /MD /Gy /EHsc /TP /arch:SSE; difftest PASS (265 valid, 90% coverage)
 00a57aa0 82 CollTable::AllocNode(src): fixed-pool/free-list node clone (rep movsd); frame/regalloc differ (compiled 105 vs original 76). flags /O2 /MD /Gy /EHsc /TP; difftest PASS (274 valid, 100% coverage)
 00a57b60 88 LookupKey(a0,a1,a2,outA,outB): builds 5-dword key and calls Lookup; frame/register allocation differ. flags /O2 /MD /Gy /EHsc /TP /arch:SSE; difftest PASS (265 valid, 72.5% coverage)

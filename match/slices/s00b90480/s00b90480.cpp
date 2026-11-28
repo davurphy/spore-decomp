@@ -284,19 +284,15 @@ int* FUN_00b90960(int* param_1, int* param_2, ContinentId param_3)
 }
 
 // @ 0x00b909a0
-int* FUN_00b909a0(int* param_1, int* param_2, int* param_3, int param_4)
-{
-    if (param_1 == param_2)
-        return param_3;
-    do {
+int* FUN_00b909a0(int* param_1, int* param_2, int* param_3, ContinentId param_4)
+{    for (; param_1 != param_2; ++param_1) {
         int uVar1 = ((int (__thiscall*)(int))(*(void***)(*param_1 + 0x34))[0x2c / 4])(*param_1 + 0x34);
         int iVar2 = ((PlanetModelObj*)PlanetModel())->GetContinent((const void*)uVar1);
-        if (param_4 == iVar2) {
+        if (param_4.value == iVar2) {
             *param_3 = *param_1;
-            param_3 = param_3 + 1;
+            ++param_3;
         }
-        param_1 = param_1 + 1;
-    } while (param_1 != param_2);
+    }
     return param_3;
 }
 

@@ -507,24 +507,25 @@ int cKeySlotList::NextRun(uint i) const
     }
 }
 
+struct cKeySlotIter {
+    cKeySlot* mpSlot;
+    cKeySlotIter(cKeySlot* p) : mpSlot(p) {}
+};
+
 // @ 0x00b0cf80
-void FindSlotRun(cKeySlot** ppOut, cKeySlot* pBegin, cKeySlot* pEnd, cSlotObject* const* ppValue)
-{
-    while (pEnd != pBegin) {
-        if (pBegin->mpValue.mpObject == *ppValue)
-            break;
+cKeySlotIter FindSlotRun(cKeySlotIter pBegin, cKeySlotIter pEnd, cSlotObject* const* ppValue)
+{    while (pEnd.mpSlot != pBegin.mpSlot && pBegin.mpSlot->mpValue.mpObject != *ppValue) {
         bool bContinues = true;
         do {
-            cKeySlot* pPrev = pBegin;
-            ++pBegin;
+            cKeySlot* pPrev = pBegin.mpSlot;
+            ++pBegin.mpSlot;
             bool bLast = ((pPrev->mFlags >> 30) & 1) != 0;
             if (bLast)
                 break;
-            bContinues = ((pBegin->mFlags >> 31) & 1) != 0;
+            bContinues = ((pBegin.mpSlot->mFlags >> 31) & 1) != 0;
         } while (bContinues);
     }
-    *ppOut = pBegin;
-}
+    return pBegin;}
 
 // @ 0x00b0cfd0
 void __stdcall DestroySlots(cKeySlot* pBegin, cKeySlot* pEnd)
@@ -619,14 +620,15 @@ void WriteObjectList(IObjectPipe* pPipe, const cSlotObjectList& objects)
 
 // @ 0x00b0d250
 bool cPlanetDataBlockSaver::Save(IObjectPipe* pPipe)
-{
+{    struct Local {
+        static inline void WriteU32(EA::IO::IStream* pStream, uint nVal) {
+            EA::IO::WriteUint32(pStream, &nVal, 1, 0);
+        }
+    };
     IStreamAccess* pAccess = pPipe->Stream();
-    uint nId = mId;
-    EA::IO::IStream* pStream = pAccess->GetBytes();
-    EA::IO::WriteUint32(pStream, &nId, 1, 0);
+    Local::WriteU32(pAccess->GetBytes(), mId);
     WriteObjectList(pPipe, mObjects);
-    return true;
-}
+    return true;}
 
 // ---------------------------------------------------------------------------
 // record table

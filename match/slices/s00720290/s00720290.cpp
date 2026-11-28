@@ -74,7 +74,7 @@ struct MeshAdj {
     void*   mCbArg;      // +0x38
     bool    mFlag;       // +0x3c
     void AddTri(int a, int n, int c, int* in, Pair16* out, int d);
-    void LinkRec(int node, int pos, int val);
+    void LinkRec(Pair16 p, int val);
     void Build();
 };
 
@@ -168,18 +168,15 @@ void MeshAdj::AddTri(int a, int n, int c, int* in, Pair16* out, int d)
 }
 
 // @ 0x00720470
-void MeshAdj::LinkRec(int node, int pos, int val)
-{
-    Rec18* r = &mRecords[node];
+void MeshAdj::LinkRec(Pair16 p, int val)
+{    Rec18* r = &mRecords[p.first];
     int mod = r->f5;
-    pos = pos + 1;
+    int pos = p.second + 1;
     if (pos % mod == 0)
         pos = pos - mod;
     r->f2[pos] = val;
-    Pair16* p = &r->f1[pos];
-    if (p->first >= 0)
-        LinkRec(p->first, p->second, val);
-}
+    if (r->f1[pos].first >= 0)
+        LinkRec(r->f1[pos], val);}
 
 // @ 0x007204c0
 void MeshAdj::Build()
@@ -198,7 +195,7 @@ void MeshAdj::Build()
                 rec->f2[pos] = c;
                 Pair16* q = &rec->f1[pos];
                 if (q->first >= 0)
-                    LinkRec(q->first, q->second, c);
+                    LinkRec(*q, c);
             }
             Pair16* e = &mRecords[node].f1[idx];
             node = e->first;

@@ -351,13 +351,16 @@ void FUN_0059aed0(float* out, const float* v, const float* q)
 // @ 0x0059b060
 // Axis/angle -> quaternion (free function).
 void SetQuaternionFromAxisAngle(float* out, const float* axis, float angle)
-{
-    float x = axis[0], y = axis[1], z = axis[2];
-    volatile float sc[2];
-    sc[0] = sinf(angle * 0.5f);
-    sc[1] = cosf(angle * 0.5f);
-    out[0] = x * sc[0];
-    out[1] = y * sc[0];
-    out[2] = z * sc[0];
-    out[3] = sc[1];
+{    struct Vec3 {
+        float x, y, z;
+        Vec3(float ax, float ay, float az) : x(ax), y(ay), z(az) {}
+        Vec3 operator*(float k) const { return Vec3(x * k, y * k, z * k); }
+    };
+    float s = sinf(angle * 0.5f);
+    float c = cosf(angle * 0.5f);
+    Vec3 v = (*(const Vec3*)axis) * s;
+    out[0] = v.x;
+    out[1] = v.y;
+    out[2] = v.z;
+    out[3] = c;
 }

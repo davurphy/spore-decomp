@@ -317,22 +317,16 @@ bool Hub3::Want(const Key3* k) {
 }
 
 // @ 0x644550
-void Hub3::Load(VecT<Key3>* v, char b) {
-    AT(uint8_t, 0xa10) = 0;
+void Hub3::Load(VecT<Key3>* v, char b) {    AT(uint8_t, 0xa10) = 0;
     ((HubC*)this)->Clear();
     if (v) {
         if (!b) AT(VecE, 0x78).Reserve((uint32_t)(((char*)v->mpEnd - (char*)v->mpBegin) >> 4));
         else AT(VecE, 0x78).set_capacity_impl(0xffffffff);
-        int off = 0;
         int n = (int)(((char*)v->mpEnd - (char*)v->mpBegin) >> 4);
-        if (n > 0) {
-            do {
-                Request((Entry*)((char*)v->mpBegin + off), b);
-                off += 0x10;
-            } while (--n);
+        for (int i = 0; i < n; ++i) {
+            Request((Entry*)v->mpBegin + i, b);
         }
-    }
-}
+    }}
 
 // @ 0x6445c0
 void Hub3::Load2(VecT<Key3>* src) {

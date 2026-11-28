@@ -115,6 +115,8 @@ struct cTestScript {
     u8   OnCard(int id);                     // 0x00ec6820
     u8   OnCardId(void* p);                  // 0x00ec68d0
     void KillSeti();                         // inline helper (audio + seti kill)
+    void OnReset();                          // 0x00ec51f0
+    void OnTick(int msg, void* args);        // 0x00ec56b0
 };
 
 // Helper shared by every KillMessage() arm: stop the audio system's current
@@ -443,14 +445,19 @@ struct TickCtx {
 // @ 0x00ec67d0
 u8 __fastcall FUN_00ec67d0(TickCtx* self, void*, int msg, void* args)
 {
-    cTestScript* p = (cTestScript*)((char*)self - 8);
+    struct H {
+        static inline cTestScript* ToScript(TickCtx* s) { return (cTestScript*)((char*)s - 8); }
+    };
     if (msg == 0x1ee100a) {
-        FUN_00ec51f0();
+        H::ToScript(self)->OnReset();
     }
-    if (self->mMode == 1) {
-        FUN_00ec56b0();
-    } else if (self->mMode == 2) {
-        p->HandleMessage(msg, args);
+    switch (self->mMode) {
+    case 1:
+        H::ToScript(self)->OnTick(msg, args);
+        break;
+    case 2:
+        H::ToScript(self)->HandleMessage(msg, args);
+        break;
     }
     return 0;
 }

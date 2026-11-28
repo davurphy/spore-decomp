@@ -507,22 +507,21 @@ int MixFlush(MixVoice* v, AudioCtx* ctx)
     return 1;
 }
 
+#include "sse_helpers.h"
+
 // @ 0x0114bad0
 bool __stdcall MixChunkTime(AudioCtx* ctx, double time, int* out)
-{
-    double delta = time - ctx->mTime;
+{    double delta = time - ctx->mTime;
     if (delta > 0.0) {
         float v = delta * ctx->mpRate->mScale;
-        if (v < 256.0f) {
-            v *= ctx->mScale;
-            *out = (int)v;
-            return true;
-        }
-        return false;
+        if (v >= 256.0f)
+            return false;
+        v *= ctx->mScale;
+        *out = SseTruncToInt(v);
+        return true;
     }
     *out = 0;
-    return true;
-}
+    return true;}
 
 // @ 0x0114bb40
 int MixVoice::Advance(AudioCtx* ctx)

@@ -301,24 +301,20 @@ void __cdecl advance_to_surface(Tracked* self)
 // @ 0x00ebafe0
 void __cdecl init_tracked(Tracked* t, int mode, const Vec3* dir, const Vec4* quat,
                           float radius, u32 flags)
-{
-    t->dir  = *dir;
+{    t->dir  = *dir;
     t->quat = *quat;
 
-    // The original keeps a register pointer to dir and drives the inline sqrt and
-    // the dir2/dir3 copies through it.
     Vec3* d = &t->dir;
-    t->dir2 = *d;
-    t->mode = flags;
     t->speed = sqrtf(d->x * d->x + d->y * d->y + d->z * d->z);
+    t->dir2 = t->dir;
+    t->mode = flags;
 
     Vec3 tmp;
     t->offset = *camera_project(&tmp, d);
 
     t->flag = advance_dispatch(mode, d, d, t->mode, t->flag);
-    t->dir3 = *d;
-    t->radius = radius;
-}
+    t->dir3 = t->dir;
+    t->radius = radius;}
 
 // ------------------------------------------------------------------ 0x00ebb0b0
 // Track the point where the camera ray meets the sphere around the origin.

@@ -1,2 +1,3 @@
 slices/s00eba650/s00eba650.cpp  ?mask_dispatch@@YA_NPBUVec3@@0I@Z  00eba790  /O2 /MD /Gy /TP /arch:SSE /fp:fast
 slices/s00eba650/s00eba650.cpp  ?advance_dispatch@@YA_NHPBUVec3@@0I_N@Z  00eba7f0  /O2 /MD /Gy /TP /arch:SSE /fp:fast
+slices/s00eba650/s00eba650.cpp  ?init_tracked@@YAXPAUTracked@@HPBUVec3@@PBUVec4@@MI@Z  00ebafe0  /O2 /MD /Gy /TP /arch:SSE /fp:fast

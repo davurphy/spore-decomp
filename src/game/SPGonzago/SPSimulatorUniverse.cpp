@@ -1923,18 +1923,18 @@ u32 GrobTeaseRaidEvent_s0101_37b0::TryCreateMission(cMissionIface* iface, u32 pa
 
 // @ 0x010144c0
 void __cdecl FUN_010144c0(void* self, cStarRefVec* refs)
-{
+{  struct LocalCmp {
+    float x, y, z;
+    LocalCmp(const LocalCmp& o) : x(o.x), y(o.y), z(o.z) {}
+    static inline void Sort(void* first, void* last, Vec3 pos) {
+      ((void(__cdecl*)(void*, void*, LocalCmp))FUN_01012d70)(first, last, *(LocalCmp*)&pos);
+    }
+  };
   cStarTable* stars = ((cSpaceGame*)SpaceGameGet())->mpStars_30;
   refs->FUN_01011cc0(&stars->mStars2_2c);
 
   cGameNounManager_s0101_37b0* nouns = ((cNounBase*)self)->BioProtectorSort();
-  Vec3* cities = nouns->GetCities();
-  Vec3 pos;
-  pos.x = cities->x;
-  pos.y = cities->y;
-  pos.z = cities->z;
-  FUN_01012d70(refs->mpBegin, refs->mpEnd, pos);
-}
+  LocalCmp::Sort(refs->mpBegin, refs->mpEnd, *nouns->GetCities());}
 
 // @ 0x01014540
 s32 __cdecl FUN_01014540(void* mission)

@@ -848,27 +848,30 @@ void FUN_00799110(int param_1, float param_2, float *param_3, float *param_4, fl
     return;
 }
 
-// @ 0x00799290
-int **FUN_00799290(int **param_1, int *param_2, int *param_3, int *param_4)
-{
-    int *piVar1;
-    int iVar2;
+struct Iter00799290 {
+    int* mp;
+    Iter00799290(int* p) : mp(p) {}
+    Iter00799290& operator++() { mp += 2; return *this; }
+    bool operator!=(const Iter00799290& o) const { return mp != o.mp; }
+};
 
-    *param_1 = param_4;
-    for (; param_2 != param_3; param_2 = param_2 + 2) {
-        piVar1 = *param_1;
+// @ 0x00799290
+Iter00799290 FUN_00799290(Iter00799290 param_2, Iter00799290 param_3, Iter00799290 param_4)
+{    Iter00799290 cur(param_4);
+    for (; param_2 != param_3; ++param_2) {
+        int* piVar1 = cur.mp;
         if (piVar1 != (int *)0x0) {
-            iVar2 = *param_2;
+            int* src = param_2.mp;
+            int iVar2 = *src;
             *piVar1 = iVar2;
             if (iVar2 != 0) {
                 _InterlockedIncrement((volatile long *)(iVar2 + 4));
             }
-            piVar1[1] = param_2[1];
+            piVar1[1] = src[1];
         }
-        *param_1 = (int *)((char *)*param_1 + 8);
+        ++cur;
     }
-    return param_1;
-}
+    return cur;}
 
 // @ 0x007992e0
 int* FUN_007992e0(int *param_1, int *param_2, int *param_3)

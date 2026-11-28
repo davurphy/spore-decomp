@@ -161,11 +161,8 @@ bool EA::IO::FilePath::SafeReplace(const unsigned short* arg0, const unsigned sh
 
 // @ 0x0092fe00
 bool EnsureTrailingPathSeparator(unsigned short* path, int length)
-{
-    if (length == -1) {
-        unsigned short* p = path;
-        while (*p++) {}
-        length = (int)(p - (path + 1));
+{    if (length == -1) {
+        length = (int)wcslen((const wchar_t*)path);
     }
     if (length != 0) {
         unsigned int c = path[length - 1];
@@ -173,8 +170,7 @@ bool EnsureTrailingPathSeparator(unsigned short* path, int length)
     }
     path[length] = '\\';
     path[length + 1] = 0;
-    return true;
-}
+    return true;}
 
 // @ 0x0092fe60
 int ConcatenatePathComponents(unsigned short* dst, const unsigned short* c1, const unsigned short* c2)

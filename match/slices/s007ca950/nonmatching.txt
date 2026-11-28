@@ -1,3 +1,2 @@
 007cab40  111  eastl::vector<AutoRefCount<cPropertyList>,fixed_vector_allocator<4,4,4,0,1>>::resize(size_type): complete; the T() temporary is placed in a different stack slot and cl uses ebx for size(), differing register/stack shape.
-007cb160  166  `anonymous namespace'::cOptionPropertiesCommand::Execute: complete; ResourceKey variant path, same as the scalar commands (temp layout differs).
 007cb270  167  `anonymous namespace' property-list command Execute (unnamed, PDB candidate cOptionPropertiesCommand::Execute): complete; PropertyManager GetPropertyList + pList slot 0x30 call with different register scheduling.

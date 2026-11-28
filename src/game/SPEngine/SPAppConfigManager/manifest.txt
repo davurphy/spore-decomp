@@ -45,3 +45,4 @@
 ../src/game/SPEngine/SPAppConfigManager.cpp  ?Execute@cOptionBoolPropertyCommand@@QAEXPAUcArguments_s007c_a950@ArgScript@EA@@@Z  007cae30  /O2 /MD /Gy /EHsc /TP /GS- /Isrc/game/include
 ../src/game/SPEngine/SPAppConfigManager.cpp  ?Execute@cOptionIntPropertyCommand@@QAEXPAUcArguments_s007c_a950@ArgScript@EA@@@Z  007caf40  /O2 /MD /Gy /EHsc /TP /GS- /Isrc/game/include
 ../src/game/SPEngine/SPAppConfigManager.cpp  ?Execute@cOptionFloatPropertyCommand@@QAEXPAUcArguments_s007c_a950@ArgScript@EA@@@Z  007cb050  /O2 /MD /Gy /EHsc /TP /GS- /Isrc/game/include
+../src/game/SPEngine/SPAppConfigManager.cpp  ?Execute@cOptionPropertiesCommand@@QAEXPAUcArguments_s007c_a950@ArgScript@EA@@@Z  007cb160  /O2 /MD /Gy /EHsc /TP /GS- /Isrc/game/include

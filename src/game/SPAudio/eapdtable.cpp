@@ -29,6 +29,8 @@ void* __cdecl FUN_00a48ea0(uint32 a, uint32 b, void* ctor, uint32 size,
 bool  __cdecl FUN_00a47f30(void* cls, void* handler);                      // 0x00a47f30
 bool  __cdecl FUN_00a48a80(void* cls, void* method, uint32 a, uint32 b,
                             uint32 c, uint32 d, uint32 e, uint32 f);         // 0x00a48a80
+bool  __cdecl FUN_00a48a80(void* cls, void* method, uint32 a, uint32 b,
+                            uint32 c, uint32 d);                              // 0x00a48a80 (6-dword class_addmethod1)
 bool  __cdecl FUN_00a48a30(void* cls, void* method, uint32 a, uint32 b,
                              uint32 c);                            // 0x00a48a30
 void* __cdecl FUN_00a49390(void* cls);                                   // 0x00a49390
@@ -148,16 +150,16 @@ void* __cdecl fx_alloc_insert2(uint32 a, uint32 b)
 
 // @ 0x00a62a50
 bool __cdecl fx_register_metaparticles()
-{
+{    extern void __cdecl FUN_00a57730();
     EapdInterned a;
-    FUN_00a675f0(&a, "tabread4");
-    void* cls = FUN_00a48ea0(a.name, a.id, (void*)fx_alloc_insert2, 0x30,
-                                  0, 6, 0, 0);
-    g_fxCmptMeta3_1675850 = (uint32)cls;
-    bool ok = cls != 0;
-    ok &= FUN_00a47f30(cls, (void*)fx_decal_update);
-    FUN_00a675f0(&a, g_fxEmptyStr_13f2ce4);
-    ok &= FUN_00a48a80((void*)g_fxCmptMeta3_1675850, (void*)0xa57730, a.name, a.id, 2, 0, 0, 0);
+    EapdInterned* pA = FUN_00a675f0(&a, "tabread4");
+    g_fxCmptMeta3_1675850 = (uint32)FUN_00a48ea0(pA->name, pA->id, (void*)fx_alloc_insert2, 0,
+                                                 0x30, 0, 6, 0);
+    bool ok = g_fxCmptMeta3_1675850 != 0;
+    ok &= 1;
+    ok &= FUN_00a47f30((void*)g_fxCmptMeta3_1675850, (void*)fx_decal_update);
+    pA = FUN_00a675f0(&a, g_fxEmptyStr_13f2ce4);
+    ok &= FUN_00a48a80((void*)g_fxCmptMeta3_1675850, (void*)FUN_00a57730, pA->name, pA->id, 2, 0);
     return ok;
 }
 

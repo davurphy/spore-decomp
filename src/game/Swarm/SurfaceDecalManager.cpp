@@ -492,38 +492,34 @@ SurfaceDecals* SurfaceDecals::BaseCtor()
 
 // @ 0x00a80b80
 bool SurfaceDecals::Reset()
-{
-  if (mObj14 != 0)
+{  if (mObj14 != 0)
     ClearParticles();
 
   IntrusiveList* anchor = &mListAC;
   while (anchor->mPrev != anchor) {
-    CellDataNode* first = (CellDataNode*)anchor->mNext;
-    CellDataNode* next = first->mNext;
-    next->mPrev = (CellDataNode*)anchor;
-    anchor->mNext = (IntrusiveList*)next;
-    if (first != (CellDataNode*)anchor) {
-      first->mPrev = 0;
-      first->mNext = 0;
+    CellDataNode* first = (CellDataNode*)mListAC.mNext;
+    IntrusiveList* node = anchor->mNext;
+    node->mNext->mPrev = anchor;
+    anchor->mNext = anchor->mNext->mNext;
+    if (node != anchor) {
+      node->mPrev = 0;
+      node->mNext = 0;
     }
     if (first != 0)
       FreeMem(first);
   }
 
   IntrusiveList* anchorA4 = &mListA4;
-  uint32_t* p = (uint32_t*)mListA4.mNext;
-  if (p != (uint32_t*)anchorA4) {
-    do {
-      uint32_t next = *p;
-      p[1] = 0;
-      p[0] = 0;
-      p = (uint32_t*)next;
-    } while (p != (uint32_t*)anchorA4);
+  IntrusiveList* p = anchorA4->mNext;
+  while (p != anchorA4) {
+    IntrusiveList* next = p->mNext;
+    p->mPrev = 0;
+    p->mNext = 0;
+    p = next;
   }
-  mListA4.mPrev = anchorA4;
-  mListA4.mNext = anchorA4;
-  return true;
-}
+  anchorA4->mPrev = anchorA4;
+  anchorA4->mNext = anchorA4;
+  return true;}
 
 // @ 0x00a80c00
 InsertResult* HashTable::Insert(InsertResult* out, const uint32_t* key,

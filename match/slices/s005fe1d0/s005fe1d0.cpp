@@ -476,8 +476,7 @@ class cSPUIIDCollector : public IAppComponent, public IAppComponent2, public EA:
 };
 
 // @ 0x005fe1d0
-void cSPUIIDCollector::Shutdown() {
-  mIDs.clear();
+void cSPUIIDCollector::Shutdown() {  mIDs.clear();
   if (mpMessageServer) {
     void* const pServer = mpMessageServer;
     mpMessageServer = 0;
@@ -489,7 +488,7 @@ void cSPUIIDCollector::Shutdown() {
   if (mpSharedState) {
     SharedState* const pState = mpSharedState;
     mpSharedState = 0;
-    pState->mRefCount.Decrement();
+    _InterlockedDecrement((volatile long*)&pState->mRefCount.mValue);
     if (pState->mRefCount.GetValue() < 1)
       pState->mRefCount.Increment();
     else
@@ -499,8 +498,7 @@ void cSPUIIDCollector::Shutdown() {
     mpLayout->Shutdown(true);
     delete mpLayout;
     mpLayout = 0;
-  }
-}
+  }}
 
 // @ 0x005fe2b0
 bool cSPUIIDCollector::HandleMessage(uint32_t messageID, void* pMessage) {

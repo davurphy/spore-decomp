@@ -373,7 +373,14 @@ struct ModelPtrVec {                                  // eastl::fixed_vector<cMW
     ModelPtrVec() { mpBegin = mBuffer; mpEnd = mBuffer; mpBuffer = mBuffer; mpCapacity = mBuffer + 17; }
     ~ModelPtrVec() { if (mpBegin && mpBegin != mBuffer) operator delete[](mpBegin); }
 };
-char** UninitCopyElem78(char** out, char* first, char* last, char* base, const void* extra);  // 0x7d5aa0
+struct Elem78Iter {
+    char* mIterator;
+    Elem78Iter(char* p) : mIterator(p) {}
+    Elem78Iter& operator++() { mIterator += 0x78; return *this; }
+    bool operator!=(const Elem78Iter& x) const { return mIterator != x.mIterator; }
+};
+struct Elem78False {};
+Elem78Iter UninitCopyElem78(Elem78Iter first, Elem78Iter last, Elem78Iter base, Elem78False);  // 0x7d5aa0
 struct RBNodeBase { RBNodeBase* mpNodeRight; RBNodeBase* mpNodeLeft; RBNodeBase* mpNodeParent; int mColor; };
 struct RbMap {                                        // eastl::map copy-constructed from another map
     int pad0;
@@ -1068,19 +1075,12 @@ void SerTree(void* stream, char* tree)
 
 // @ 0x007d0450
 void* SerResp(void* stream, int* vec)
-{
-    int n = (vec[1] - vec[0]) / 0x2c;
-    WU32(stream, &n, 1, 0);
-    if (n != 0) {
-        int i = 0;
-        do {
-            Ser360(stream, (char*)vec[0] + i);
-            i += 0x2c;
-            n = n - 1;
-        } while (n != 0);
+{    int n = (vec[1] - vec[0]) / 0x2c;
+    WriteUint32(stream, (uint32_t)n, 1, 0);
+    for (uint32_t i = 0; i < (uint32_t)n; ++i) {
+        Ser360(stream, (char*)vec[0] + i * 0x2c);
     }
-    return stream;
-}
+    return stream;}
 
 // @ 0x007d04b0
 void* SerDlg(void* stream, int* vec)
@@ -1215,18 +1215,17 @@ CtrlVec::~CtrlVec()
 }
 
 // @ 0x007d5aa0
-char** UninitCopyElem78(char** out, char* first, char* last, char* base, const void* extra)
-{
-    *out = base;
-    while (first != last) {
-        char* p = *out;
-        if (p) { *(uint32_t*)p = *(uint32_t*)first; new (p + 4) cSplitInstance(first + 4); }
-        *out = *out + 0x78;
-        first += 0x78;
-    }
-    (void)extra;
-    return out;
-}
+Elem78Iter UninitCopyElem78(Elem78Iter first, Elem78Iter last, Elem78Iter base, Elem78False)
+{    struct LocalElem {
+        uint32_t mNextFree;
+        cSplitInstance mData;
+        char pad[0x74 - sizeof(cSplitInstance)];
+        LocalElem(const LocalElem& o) : mNextFree(o.mNextFree), mData(&o.mData) {}
+    };
+    Elem78Iter currentDest(base);
+    for (; first != last; ++first, ++currentDest)
+        ::new ((void*)currentDest.mIterator) LocalElem(*(const LocalElem*)first.mIterator);
+    return currentDest;}
 
 // @ 0x007d5af0
 cGameModelEffect::cGameModelEffect(void* desc, int packageID)
@@ -1349,23 +1348,22 @@ void* __stdcall AllocAndCopy78(unsigned n, char* first, char* last)
 {
     char* buf = n ? (char*)operator new(n * 0x78, "App", 0, 0, EASTL_ALLOC_FILE, 0xd1) : 0;
     char* out = buf;
-    UninitCopyElem78(&out, first, last, buf, 0);
+    UninitCopyElem78(Elem78Iter(first), Elem78Iter(last), Elem78Iter(buf), Elem78False());
     return buf;
 }
 
 // @ 0x007d6250
 Elem78* CopyElems78(Elem78* first, Elem78* last, Elem78* dst)
-{
-    if (first == last) return dst;
-    while (first != last) {
+{    struct LocalSplitInstance {
+        uint8_t mFlags;
+        cTransform mInstanceTransform;
+        cTransform mFinalTransform;
+    };
+    for (; first != last; ++dst, ++first) {
         dst->mNextFree = first->mNextFree;
-        dst->mFlags = first->mFlags;
-        dst->mInstanceTransform = first->mInstanceTransform;
-        dst->mFinalTransform = first->mFinalTransform;
-        ++first; ++dst;
+        *(LocalSplitInstance*)&dst->mFlags = *(const LocalSplitInstance*)&first->mFlags;
     }
-    return dst;
-}
+    return dst;}
 
 // @ 0x007d6380
 cMapResA* MakeMapResA(void* mem, const RbMap& m)

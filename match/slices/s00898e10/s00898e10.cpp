@@ -20,7 +20,9 @@ struct AllocObj {
     virtual void* allocate(unsigned size, int align, void* tag);   // +0x08
 };
 
-struct ReportHelper;
+struct UninitTag {};
+struct UninitIter { void* p; UninitIter(void* q) : p(q) {} };
+UninitIter __cdecl FUN_00c04920(void* first, void* last, void* dest, UninitTag tag);
 
 struct Reporter {
     void* m00;                                      // +0x00
@@ -29,24 +31,12 @@ struct Reporter {
     void* m0c;                                      // +0x0c  allocator object
     void* m10;                                      // +0x10  allocation tag
 
-    void* Build(int count, void* a, void* b, void* c);   // 0x00898e10
-    void  Emit(ReportHelper* out, void* a, void* b, void* c, void* buf);
-};
-
-struct ReportHelper {
-    void* m00;                                      // +0x00
-    float m04;                                      // +0x04  set up by 0x00898ce0
-    void* m08;                                      // +0x08
-    void* m0c;                                      // +0x0c
-    void* m10;                                      // +0x10
-
-    void Fill(void* p0, void* p1, void* p2, void* p3);   // 0x00c04920
+    void* Build(int count, void* a, void* b);       // 0x00898e10
 };
 
 // @ 0x00898e10
-void* Reporter::Build(int count, void* a, void* b, void* c)
-{
-    void* buf;
+void* Reporter::Build(int count, void* a, void* b)
+{    void* buf;
     if (count != 0)
     {
         AllocObj* alloc = (AllocObj*)m0c;
@@ -57,11 +47,6 @@ void* Reporter::Build(int count, void* a, void* b, void* c)
     {
         buf = 0;
     }
-    Emit((ReportHelper*)(this + 1), a, b, c, buf);
-    return buf;
-}
-
-void Reporter::Emit(ReportHelper* out, void* a, void* b, void* c, void* buf)
-{
-    out->Fill(buf, a, b, c);
-}
+    UninitTag tag;
+    FUN_00c04920(a, b, buf, tag);
+    return buf;}

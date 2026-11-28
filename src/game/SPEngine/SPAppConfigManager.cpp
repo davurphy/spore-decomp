@@ -3321,16 +3321,22 @@ void cOptionFloatPropertyCommand::Execute(EA::ArgScript::cArguments_s007c_a950* 
 
 // @ 0x007cb160
 void cOptionPropertiesCommand::Execute(EA::ArgScript::cArguments_s007c_a950* pArgs)
-{
-    void** main = pArgs->MainArguments(2);
+{    void** main = pArgs->MainArguments(2);
     void** opt = pArgs->OptionArguments("list", 1);
-    SP::cPropertyList_s007c_a950* pList = GetTargetList(this, opt);
+    SP::cPropertyList_s007c_a950* pList;
+    if (opt) {
+        OptionTable* t = mpTable;
+        SP::cOption_s007c_a950* pOpt = (SP::cOption_s007c_a950*)(t->mBase + t->mCount * 0xac);
+        PropMap* pMap = &pOpt->mExternalSettings.mpBegin[t->mIndex];
+        pList = GetPropListSettings(opt[0], pMap);
+    } else {
+        OptionTable* t = mpTable;
+        pList = ((SP::cOption_s007c_a950*)t->mBase)[t->mCount].mPropertySettings.mpBegin[t->mIndex].mpObject;
+    }
     if (pList) {
-        EA::ResourceMan::Key_s007c_a950 key;
-        key.mInstance = 0; key.mType = 0; key.mGroup = 0; key.mPad = 0;
+        EA::ResourceMan::Key key;
         SPKeyFromName(&key, (const wchar_t*)main[1], 0, 0);
-        EA::Variant_s007c_a950 v;
-        v = key;
+        EA::Variant_s007c_a950 v(*(const EA::ResourceMan::Key_s007c_a950*)&key);
         pList->SetProperty(GetPropID((const char*)main[0]), v);
     }
 }

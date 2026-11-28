@@ -292,14 +292,12 @@ void FUN_00b16450(float* v, int* list)
 
 // @ 0x00b16490
 void FUN_00b16490(float* v, float add)
-{
-    float x = v[0], y = v[1], z = v[2];
-    float len = sqrtf(z * z + (y * y + x * x));
-    float inv = 1.0f / len;
+{    float len = sqrtf(v[2] * v[2] + v[1] * v[1] + v[0] * v[0]);
     float s = len + add;
-    float tx = x * inv;
-    float ty = y * inv;
-    float tz = z * inv;
+    float inv = 1.0f / len;
+    float tx = v[0] * inv;
+    float ty = v[1] * inv;
+    float tz = v[2] * inv;
     v[0] = tx * s;
     v[1] = ty * s;
     v[2] = tz * s;

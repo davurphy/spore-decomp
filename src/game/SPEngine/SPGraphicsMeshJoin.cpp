@@ -2108,26 +2108,31 @@ void __cdecl UninitCopyFace28(cFaceCluster** out, const cFaceCluster* first, con
 
 // @ 0x00720d10
 void __cdecl FillFace28(cFaceCluster* dst, uint32_t n, const cFaceCluster* src)
-{
-    if (n == 0)
-        return;
-    do {
-        if (dst != 0) {
-            dst->mSumAreaPoint.x = src->mSumAreaPoint.x;
-            dst->mSumAreaPoint.y = src->mSumAreaPoint.y;
-            dst->mSumAreaPoint.z = src->mSumAreaPoint.z;
-            dst->mSumAreaNormal.x = src->mSumAreaNormal.x;
-            dst->mSumAreaNormal.y = src->mSumAreaNormal.y;
-            dst->mSumAreaNormal.z = src->mSumAreaNormal.z;
-            dst->mArea = src->mArea;
-            dst->mFirstEdge = src->mFirstEdge;
-            dst->mParentCluster = src->mParentCluster;
-            dst->mPreviousDE = src->mPreviousDE;
-        }
-        n--;
-        dst++;
-    } while (n != 0);
-}
+{    struct LocalVec3 {
+        float x, y, z;
+        LocalVec3(const LocalVec3& o) : x(o.x), y(o.y), z(o.z) {}
+    };
+    struct LocalCluster {
+        LocalVec3 mSumAreaPoint;
+        LocalVec3 mSumAreaNormal;
+        float mArea;
+        int mFirstEdge;
+        int mParentCluster;
+        void* mPreviousDE;
+        LocalCluster(const LocalCluster& o)
+            : mSumAreaPoint(o.mSumAreaPoint)
+            , mSumAreaNormal(o.mSumAreaNormal)
+            , mArea(o.mArea)
+            , mFirstEdge(o.mFirstEdge)
+            , mParentCluster(o.mParentCluster)
+            , mPreviousDE(o.mPreviousDE)
+        {}
+    };
+    LocalCluster* p = (LocalCluster*)dst;
+    const LocalCluster* s = (const LocalCluster*)src;
+    for (; n > 0; --n, ++p) {
+        ::new ((void*)p) LocalCluster(*s);
+    }}
 
 // @ 0x00720d70
 void __cdecl UninitCopyDual18(cDualEdge** out, const cDualEdge* first, const cDualEdge* last, cDualEdge* dst)

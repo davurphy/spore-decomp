@@ -1977,6 +1977,10 @@ void* __cdecl SpaceGameGet();                            // 0x01002bd0
 void* __cdecl SpaceGameGet(int a);                       // 0x01002bd0
 void* __cdecl FUN_010666a0(void* p);                     // 0x010666a0
 void  __cdecl FUN_0106f120(void* p);                     // 0x0106f120
+struct cSPUISpace_s00c4_6160 {
+    void FUN_0106f120(void* p);                          // 0x0106f120
+};
+cSPUISpace_s00c4_6160* __cdecl FUN_010666a0();           // 0x010666a0
 void* __cdecl FUN_01005180(u32 a);                       // 0x01005180
 void  __cdecl IntVectorResize(void* v, u32 n);           // 0x007eb820
 void* __cdecl GetMissionManager();                       // 0x00feb9f0 (no push: arg in ecx)
@@ -2659,24 +2663,16 @@ u32 cSPMission_s00c4_5860::HasValidDescription()
 
 // @ 0x00c46160
 void cSPMission_s00c4_5860::RemoveToolVector194()
-{
-    i32 n = (i32)(mVec194.mpEnd - mVec194.mpBegin);
-    if (n > 0) {
-        i32 off = 0;
-        do {
-            cSimSpaceGame* game = (cSimSpaceGame*)SpaceGameGet();
-            cPlayerInventory* inv = game->GetPlayerInventory();
-            void* key = (void*)((char*)mVec194.mpBegin + off);
-            void* item = (*(void*(__thiscall**)(void*, void*))((char*)*(void**)inv + 0x68))(inv, key);
-            if (item != 0) {
-                void* r = FUN_010666a0(item);
-                FUN_0106f120(r);
-            }
-            off += 0xc;
-            --n;
-        } while (n != 0);
-    }
-}
+{    i32 n = (i32)(mVec194.mpEnd - mVec194.mpBegin);
+    for (i32 i = 0; i < n; ++i) {
+        cSimSpaceGame* game = (cSimSpaceGame*)SpaceGameGet();
+        cPlayerInventory* inv = game->GetPlayerInventory();
+        void* key = &mVec194.mpBegin[i];
+        void* item = (*(void*(__thiscall**)(void*, void*))((char*)*(void**)inv + 0x68))(inv, key);
+        if (item != 0) {
+            FUN_010666a0()->FUN_0106f120(item);
+        }
+    }}
 
 // @ 0x00c461d0
 void cSPMission_s00c4_5860::RemoveToolVector1bc()

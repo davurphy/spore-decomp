@@ -405,19 +405,17 @@ void hkpSimpleCollisionResponse::solveSingleContact(const hkContactPoint& cp, fl
 // @ 0x010a76d0
 void _hkInitHeader(hkConstraintQueryIn* in, unsigned int arg2, unsigned int arg3,
                    hkConstraintQueryOut* out)
-{
-	const int bodyA = (int)(size_t)in->m_bodyA;
+{	const int bodyA = (int)(size_t)in->m_bodyA;
 	int* dest = out->m_schemas;
 	const int jacobianBase = (int)(size_t)in->m_jacobianBufferRoot;
 	const int bodyB = (int)(size_t)in->m_bodyB;
 	const int accumulatorBase = (int)(size_t)in->m_accumulatorBufferRoot;
 	const int jacobians = (int)(size_t)out->m_jacobians;
 
+	dest[0] = 0x180101;
 	dest[1] = jacobians - jacobianBase;
 	dest[2] = bodyA - accumulatorBase;
 	dest[3] = bodyB - accumulatorBase;
-	dest[0] = 0x180101;
 	dest[5] = (int)arg2;
 	dest[4] = (int)arg3;
-	out->m_schemas = dest + 6;
-}
+	out->m_schemas = dest + 6;}

@@ -984,14 +984,14 @@ inline void RcReleaseChecked(RC_s0073_f320* p) {
     if (r == 0) { _InterlockedExchange((volatile long*)&p->mnRefCount, 1); if (p) p->v0(1); }
 }
 struct MeshPtr { RC_s0073_f320* p; };
-struct MeshVec {
+struct MeshVecBase {
     MeshPtr* b; MeshPtr* e; MeshPtr* c; int alloc[2];
-    MeshVec() { b = 0; e = 0; c = 0; }
+    MeshVecBase() { b = 0; e = 0; c = 0; }
+    ~MeshVecBase() { if (b && ((int*)b)[-1] != 0) operator_delete__(b); }
+};
+struct MeshVec : public MeshVecBase {
     void DestroyRange(MeshPtr* first, MeshPtr* last);   // 0x4243e0
-    ~MeshVec() {
-        DestroyRange(b, e);
-        if (b && ((int*)b)[-1] != 0) operator_delete__(b);
-    }
+    ~MeshVec() { DestroyRange(b, e); }
 };
 struct ModelInstanceMeshes { void GetMeshes(MeshVec& out); };   // 0x73eb90
 struct BindQuery {
@@ -3484,22 +3484,20 @@ T8* __cdecl copy_backward8(T8* first, T8* last, T8* result)
 
 // @ 0x0073fe80
 bool __fastcall ValidateA(char* self)
-{
-    bool ok = false;
+{    bool ok = false;
     MeshVec meshes;
     (*(ModelInstanceMeshes**)(self + 0xc))->GetMeshes(meshes);
     BindQuery q;
     if (BuildQuery(&q, &meshes, *(int*)(self + 0x10)) && q.count == 3) {
+        int i = 0;
         ok = true;
-        self += 0x14;
-        for (int i = 0; i < 3; ++i) {
-            if (ok && q.Check(self, 3, i, 1, -1)) ok = true;
-            else ok = false;
-            self += 0xc;
+        char* p = self + 0x14;
+        for (; i < 3; ++i) {
+            ok = ok && q.Check(p, 3, i, 1, -1);
+            p += 0xc;
         }
     }
-    return ok;
-}
+    return ok;}
 
 // @ 0x0073ffb0
 bool __fastcall ValidateB(char* self)

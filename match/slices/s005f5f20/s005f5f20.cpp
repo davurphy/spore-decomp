@@ -811,18 +811,16 @@ void cSPSwatch::Shutdown() {
 }
 
 // @ 0x005F6AE0
-void cSPPaletteSwatch::OnRolloverEnd2() {
-  EA::Messaging::Server* server = MessageServer();
+void cSPPaletteSwatch::OnRolloverEnd2() {  EA::Messaging::Server* server = MessageServer();
   if (server)
-    server->RemoveHandler((EA::Messaging::IHandler*)((char*)this + 0xc), 0x3150c27, 0xffffd8f1);
-  cSPPaletteItemRollover* rollover = (cSPPaletteItemRollover*)FUN_0113ae10();
+    server->RemoveHandler(this, 0x3150c27, 0xffffd8f1);
+  cSPPaletteItemRollover* rollover = SwatchManager()->GetSwatchRollover();
   if (rollover) {
-    cSPPaletteInfo* info = mInfo;
-    cSPPaletteItemRollover* r = (info && info->mRollover) ? info->mRollover : rollover;
-    FUN_005ed6c0(r);
+    if (mInfo->mRollover)
+      rollover = mInfo->mRollover;
+    rollover->Hide();
   }
-  ((cSPSwatch*)this)->Shutdown();
-}
+  Shutdown();}
 
 // @ 0x005F5F20
 void cSPSwatch::SetModel(Key* key) {

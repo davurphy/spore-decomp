@@ -26,7 +26,7 @@ void  __cdecl FUN_0092dc50(int, void*);
 extern char gEmptyString[];   // 0x1667bac
 extern char gStrG[];                                                  // 0x13ec47c
 extern char gDocSep[];   // 0x1401b70 (1-char separator)
-void  __cdecl operator_delete__(void*);                          // 0x00f47380
+void  __cdecl operator_delete__(void*) throw();                  // 0x00f47380
 void  __cdecl DoInsertValue(char*, const char*, uint32_t);   // 0x11e0744
 char* __cdecl SearchStr(void*, void*, void*, void*);         // 0x609d50
 template <typename T> static const T& min_alt(const T& a, const T& b) { return b < a ? b : a; }
@@ -710,35 +710,24 @@ unsigned int ArgumentSpec::ArgTypeFromName(const char* name)
 
 // @ 0x008389f0
 RawStr::RawStr(const RawStr& s, uint32_t pos, uint32_t n)
-{
-    mpBegin = 0;
+{    mpBegin = 0;
     mpEnd = 0;
     mpCapacity = 0;
     uint32_t rem = (uint32_t)(s.mpEnd - s.mpBegin) - pos;
-    const uint32_t& cnt = min_alt(rem, n);
-    char* src = s.mpBegin + pos;
-    char* end = src + cnt;
-    uint32_t len = (uint32_t)(end - src);
-    RangeInitialize(len + 1);
-    char* dst = mpBegin;
-    DoInsertValue(dst, src, len);
-    mpEnd = dst + len;
-    *mpEnd = 0;
-}
+    const uint32_t& cnt = min_alt(n, rem);
+    const char* src = s.mpBegin + pos;
+    RangeInitialize(src, src + cnt);}
 
 // @ 0x00838a60
 int RawStr::Find(const char* p, uint32_t pos)
-{
-    const char* e = p;
-    while (*e) ++e;
+{    uint32_t n = (uint32_t)strlen(p);
     char* begin = mpBegin;
     char* end = mpEnd;
     if (pos < (uint32_t)(end - begin)) {
-        char* r = SearchStr(begin + pos, end, (void*)p, (void*)e);
+        char* r = SearchStr(begin + pos, end, (void*)p, (void*)(p + n));
         if (r != end) return (int)(r - begin);
     }
-    return -1;
-}
+    return -1;}
 
 // @ 0x00838ab0
 Ent* Ent::CopyFrom(const Ent* src)
@@ -914,23 +903,23 @@ done:
 // @ 0x008392b0
 void AddDocString(RawStr* out, const char* prefix, LocalStr s)
 {
+    struct H {
+        static __forceinline const char* CStr(const LocalStr& x) { return x.mpBegin; }
+        static inline int FindNewline(const LocalStr& x, uint32_t start) {
+            if (start < (uint32_t)(x.mpEnd - x.mpBegin)) {
+                char* p = x.mpBegin + start;
+                while (p != x.mpEnd && *p != '\n')
+                    ++p;
+                if (p != x.mpEnd)
+                    return (int)(p - x.mpBegin);
+            }
+            return -1;
+        }
+    };
     uint32_t pos = 0;
     for (;;) {
-        int idx;
-        if (pos < (uint32_t)(s.mpEnd - s.mpBegin)) {
-            for (char* p = s.mpBegin + pos; p != s.mpEnd; ++p) {
-                if (*p == '\n') {
-                    if (p != s.mpEnd) {
-                        idx = (int)(p - s.mpBegin);
-                        goto found;
-                    }
-                    break;
-                }
-            }
-        }
-        idx = -1;
-    found:
-        SprintfAppend(out, "%s%s\n", prefix, s.substr(pos, idx - pos).mpBegin);
+        int idx = H::FindNewline(s, pos);
+        SprintfAppend(out, "%s%s\n", prefix, H::CStr(s.substr(pos, idx - pos)));
         pos = idx + 1;
         if (idx == -1) return;
     }

@@ -291,8 +291,7 @@ void GetSfntClassKernValue(sfntClass* sfnt, int32 a2, int32 a3, uint16* out1, ui
 
 // @ 0x008cd860
 sfnt_OffsetTable* New_sfnt_OffsetTable(tsiMemObject* mem, InputStream* in)
-{
-    sfnt_OffsetTable* t = (sfnt_OffsetTable*)tsi_AllocMem(mem, 0x14);
+{    sfnt_OffsetTable* t = (sfnt_OffsetTable*)tsi_AllocMem(mem, 0x14);
     t->mem = mem;
     t->version = ReadInt32(in);
     t->numOffsets = ReadInt16(in);
@@ -300,16 +299,18 @@ sfnt_OffsetTable* New_sfnt_OffsetTable(tsiMemObject* mem, InputStream* in)
     t->entrySelector = ReadInt16(in);
     t->rangeShift = ReadInt16(in);
     t->table = (sfnt_DirectoryEntry*)tsi_AllocMem(mem, (uint32)t->numOffsets << 4);
-    sfnt_DirectoryEntry* e = t->table;
+    uint32* e = (uint32*)t->table;
     for (int32 i = 0; i < (int32)(uint32)t->numOffsets; i++) {
-        e->tag = ReadInt32(in);
-        e->checkSum = ReadInt32(in);
-        e->offset = ReadInt32(in);
-        e->length = ReadInt32(in);
+        *e = ReadInt32(in);
+        e++;
+        *e = ReadInt32(in);
+        e++;
+        *e = ReadInt32(in);
+        e++;
+        *e = ReadInt32(in);
         e++;
     }
-    return t;
-}
+    return t;}
 
 // @ 0x008cd910
 void Delete_sfnt_OffsetTable(sfnt_OffsetTable* t)
